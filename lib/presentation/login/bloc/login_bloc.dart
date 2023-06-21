@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
+import '../model/models.dart';
+
 part 'login_event.dart';
 
 part 'login_state.dart';
