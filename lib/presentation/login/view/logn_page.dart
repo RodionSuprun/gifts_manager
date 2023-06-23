@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gifts_manager/presentation/home/view/home_page.dart';
 import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
+import 'package:gifts_manager/presentation/login/model/models.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -118,13 +119,17 @@ class _LoginButton extends StatelessWidget {
         width: double.infinity,
         child: BlocSelector<LoginBloc, LoginState, bool>(
           selector: (state) {
-           return state.emailValid && state.passwordValid;
+            return state.allFieldsValid;
           },
           builder: (context, fieldsValid) {
             return ElevatedButton(
-              onPressed: fieldsValid ? () {
-                context.read<LoginBloc>().add(const LoginLoginButtonClicked());
-              } : null,
+              onPressed: fieldsValid
+                  ? () {
+                      context
+                          .read<LoginBloc>()
+                          .add(const LoginLoginButtonClicked());
+                    }
+                  : null,
               child: const Text("Войти"),
             );
           },
@@ -139,8 +144,7 @@ class _EmailTextField extends StatelessWidget {
     super.key,
     required FocusNode emailFocusNode,
     required FocusNode passwordFocusNode,
-  })
-      : _emailFocusNode = emailFocusNode,
+  })  : _emailFocusNode = emailFocusNode,
         _passwordFocusNode = passwordFocusNode;
 
   final FocusNode _emailFocusNode;
@@ -150,17 +154,27 @@ class _EmailTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 36),
-      child: TextField(
-        focusNode: _emailFocusNode,
-        onChanged: (text) {
-          context.read<LoginBloc>().add(LoginEmailChanged(text));
+      child: BlocSelector<LoginBloc, LoginState, EmailError>(
+        selector: (state) {
+          return state.emailError;
         },
-        onSubmitted: (text) {
-          _passwordFocusNode.requestFocus();
+        builder: (context, emailError) {
+          return TextField(
+            focusNode: _emailFocusNode,
+            onChanged: (text) {
+              context.read<LoginBloc>().add(LoginEmailChanged(text));
+            },
+            onSubmitted: (text) {
+              _passwordFocusNode.requestFocus();
+            },
+            decoration: InputDecoration(
+              hintText: "Почта",
+              errorText: emailError == EmailError.noError
+                  ? null
+                  : emailError.toString(),
+            ),
+          );
         },
-        decoration: const InputDecoration(
-          hintText: "Почта",
-        ),
       ),
     );
   }
@@ -178,17 +192,27 @@ class _PasswordTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 36),
-      child: TextField(
-        focusNode: _passwordFocusNode,
-        onChanged: (text) {
-          context.read<LoginBloc>().add(LoginPasswordChanged(text));
+      child: BlocSelector<LoginBloc, LoginState, PasswordError>(
+        selector: (state) {
+          return state.passwordError;
         },
-        onSubmitted: (text) {
-          context.read<LoginBloc>().add(const LoginLoginButtonClicked());
+        builder: (context, passwordError) {
+          return TextField(
+            focusNode: _passwordFocusNode,
+            onChanged: (text) {
+              context.read<LoginBloc>().add(LoginPasswordChanged(text));
+            },
+            onSubmitted: (text) {
+              context.read<LoginBloc>().add(const LoginLoginButtonClicked());
+            },
+            decoration: InputDecoration(
+              hintText: "Пароль",
+              errorText: passwordError == PasswordError.noError
+                  ? null
+                  : passwordError.toString(),
+            ),
+          );
         },
-        decoration: const InputDecoration(
-          hintText: "Пароль",
-        ),
       ),
     );
   }

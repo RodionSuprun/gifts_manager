@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -19,22 +20,58 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   FutureOr<void> _loginButtonClicked(
     LoginLoginButtonClicked event,
     Emitter<LoginState> emit,
-  ) {
-    if (state.passwordValid && state.emailValid) {
-      emit(state.copyWith(authenticated: true));
+  ) async {
+    if (state.allFieldsValid) {
+      final response =
+          await _login(email: state.email, password: state.password);
+      if (response == null) {
+        emit(state.copyWith(authenticated: true));
+      } else {
+        switch (response) {
+          case LoginError.emailNotExist:
+            emit(state.copyWith(emailError: EmailError.notExist));
+            break;
+          case LoginError.wrongPassword:
+            emit(state.copyWith(passwordError: PasswordError.wrongPassword));
+            break;
+        }
+      }
     }
   }
 
-  FutureOr<void> _emailChanged(LoginEmailChanged event, Emitter<LoginState> emit) {
-    final newEmail = event.email;
-    final emailValid = newEmail.length > 4;
-    emit(state.copyWith(email: newEmail, emailValid: emailValid));
+  Future<LoginError?> _login({
+    required final String email,
+    required final String password,
+  }) async {
+    final successfulResponse = Random().nextBool();
+    if (successfulResponse) {
+      return null;
+    }
+    return LoginError.values[Random().nextInt(LoginError.values.length)];
   }
 
-  FutureOr<void> _passwordChanged(LoginPasswordChanged event, Emitter<LoginState> emit) {
+  FutureOr<void> _emailChanged(
+      LoginEmailChanged event, Emitter<LoginState> emit) {
+    final newEmail = event.email;
+    final emailValid = newEmail.length > 4;
+    emit(state.copyWith(
+      email: newEmail,
+      emailValid: emailValid,
+      authenticated: false,
+      emailError: EmailError.noError,
+    ));
+  }
+
+  FutureOr<void> _passwordChanged(
+      LoginPasswordChanged event, Emitter<LoginState> emit) {
     final newPassword = event.password;
     final passwordValid = newPassword.length >= 8;
-    emit(state.copyWith(password: newPassword, passwordValid: passwordValid));
+    emit(state.copyWith(
+      password: newPassword,
+      passwordValid: passwordValid,
+      authenticated: false,
+      passwordError: PasswordError.noError,
+    ));
   }
 
   @override
@@ -49,3 +86,5 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     super.onTransition(transition);
   }
 }
+
+enum LoginError { emailNotExist, wrongPassword }
