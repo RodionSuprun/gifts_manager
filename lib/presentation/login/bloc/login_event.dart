@@ -30,3 +30,10 @@ class LoginLoginButtonClicked  extends LoginEvent {
   @override
   List<Object?> get props => [];
 }
+
+class LoginRequestErrorShowed  extends LoginEvent {
+  const LoginRequestErrorShowed();
+
+  @override
+  List<Object?> get props => [];
+}

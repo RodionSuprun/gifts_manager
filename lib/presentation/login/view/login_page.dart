@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gifts_manager/data/model/request_error.dart';
 import 'package:gifts_manager/presentation/home/view/home_page.dart';
 import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
 import 'package:gifts_manager/presentation/login/model/models.dart';
@@ -45,18 +46,38 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginBloc, LoginState>(
-      listener: (context, state) {
-        if (state.authenticated) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) {
-                return const HomePage();
-              },
-            ),
-          );
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<LoginBloc, LoginState>(
+          listener: (context, state) {
+            if (state.authenticated) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const HomePage();
+                  },
+                ),
+              );
+            }
+          },
+        ),
+        BlocListener<LoginBloc, LoginState>(
+          listener: (context, state) {
+            if (state.requestError != RequestError.noError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Произошла ошибка".toUpperCase(),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: Colors.red[900],
+                ),
+              );
+              context.read<LoginBloc>().add(LoginRequestErrorShowed());
+            }
+          },
+        ),
+      ],
       child: Column(
         children: [
           const SizedBox(

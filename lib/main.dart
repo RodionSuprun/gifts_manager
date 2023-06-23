@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gifts_manager/presentation/home/view/home_page.dart';
-import 'package:gifts_manager/presentation/login/view/logn_page.dart';
+import 'package:gifts_manager/presentation/login/view/login_page.dart';
 
 void main() {
   runApp(const MyApp());

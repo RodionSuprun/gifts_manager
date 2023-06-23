@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../../data/model/request_error.dart';
 import '../model/models.dart';
 
 part 'login_event.dart';
@@ -15,6 +16,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginLoginButtonClicked>(_loginButtonClicked);
     on<LoginEmailChanged>(_emailChanged);
     on<LoginPasswordChanged>(_passwordChanged);
+    on<LoginRequestErrorShowed>(_requestErrorShowed);
+
   }
 
   FutureOr<void> _loginButtonClicked(
@@ -33,6 +36,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             break;
           case LoginError.wrongPassword:
             emit(state.copyWith(passwordError: PasswordError.wrongPassword));
+            break;
+          case LoginError.other:
+            emit(state.copyWith(requestError: RequestError.unknown));
             break;
         }
       }
@@ -74,6 +80,17 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     ));
   }
 
+  FutureOr<void> _requestErrorShowed(
+      LoginRequestErrorShowed event, Emitter<LoginState> emit) {
+
+    emit(state.copyWith(
+      requestError: RequestError.noError
+    ));
+  }
+
+
+
+
   @override
   void onEvent(LoginEvent event) {
     print("onEvent: $event");
@@ -87,4 +104,4 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 }
 
-enum LoginError { emailNotExist, wrongPassword }
+enum LoginError { emailNotExist, wrongPassword, other }
