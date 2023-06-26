@@ -167,20 +167,20 @@ class _LoginButton extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.disabled)) {
-                    return Color.fromRGBO(54, 110, 196, 0.7);
-                  }
-                  return Color.fromRGBO(41, 80, 175, 1);
-                }),
-                textStyle: MaterialStateProperty.all(
-                  TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
+              // style: ButtonStyle(
+              //   backgroundColor: MaterialStateProperty.resolveWith((states) {
+              //     if (states.contains(MaterialState.disabled)) {
+              //       return Color.fromRGBO(54, 110, 196, 0.7);
+              //     }
+              //     return Color.fromRGBO(41, 80, 175, 1);
+              //   }),
+              //   textStyle: MaterialStateProperty.all(
+              //     TextStyle(
+              //       color: Colors.white,
+              //       fontSize: 16,
+              //     ),
+              //   ),
+              // ),
             );
           },
         ),
