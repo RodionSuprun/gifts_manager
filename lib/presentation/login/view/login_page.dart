@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gifts_manager/data/model/request_error.dart';
+import 'package:gifts_manager/extensions/theme_extension.dart';
 import 'package:gifts_manager/presentation/home/view/home_page.dart';
 import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
 import 'package:gifts_manager/presentation/login/model/models.dart';
@@ -83,10 +84,10 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
           const SizedBox(
             height: 64,
           ),
-          const Center(
+          Center(
             child: Text(
               "Вход",
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+              style: context.theme.h2,
             ),
           ),
           const Spacer(flex: 88),
@@ -108,7 +109,10 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Ещё нет аккаунта?"),
+              Text(
+                "Ещё нет аккаунта?",
+                style: context.theme.h4,
+              ),
               TextButton(
                 onPressed: () {},
                 child: const Text("Создать"),
