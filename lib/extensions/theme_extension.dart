@@ -19,3 +19,20 @@ extension ThemeStylesExtension on ThemeData {
 
   TextStyle get button => textTheme.button!;
 }
+
+extension BrightnessDependentTextStle on TextStyle {
+  TextStyle dynamicColor({
+    required BuildContext context,
+    required Color lightThemeColor,
+    required Color darkThemeColor,
+  }) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+
+    switch (brightness) {
+      case Brightness.light:
+        return copyWith(color: lightThemeColor);
+      case Brightness.dark:
+        return copyWith(color: darkThemeColor);
+    }
+  }
+}

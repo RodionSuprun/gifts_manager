@@ -5,6 +5,7 @@ import 'package:gifts_manager/extensions/theme_extension.dart';
 import 'package:gifts_manager/presentation/home/view/home_page.dart';
 import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
 import 'package:gifts_manager/presentation/login/model/models.dart';
+import 'package:gifts_manager/resources/app_colors.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -111,7 +112,11 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
             children: [
               Text(
                 "Ещё нет аккаунта?",
-                style: context.theme.h4,
+                style: context.theme.h4.dynamicColor(
+                  context: context,
+                  lightThemeColor: AppColors.lightGrey60,
+                  darkThemeColor: AppColors.darkWhite60,
+                ),
               ),
               TextButton(
                 onPressed: () {},
