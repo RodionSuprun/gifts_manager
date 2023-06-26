@@ -54,18 +54,18 @@ final darkTheme = _base.copyWith(
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       textStyle: MaterialStateProperty.resolveWith(
-            (states) {
+        (states) {
           return states.contains(MaterialState.disabled)
               ? const TextStyle(
-            color: AppColors.darkWhite60,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          )
+                  color: AppColors.darkWhite60,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                )
               : const TextStyle(
-            color: AppColors.darkWhite100,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          );
+                  color: AppColors.darkWhite100,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                );
         },
       ),
       backgroundColor: MaterialStateProperty.resolveWith((states) {
@@ -95,12 +95,46 @@ final darkTheme = _base.copyWith(
             : AppColors.darkDarkBlue100;
       }),
       backgroundColor: MaterialStateProperty.resolveWith(
-            (states) => Colors.transparent,
+        (states) => Colors.transparent,
       ),
       overlayColor: MaterialStateProperty.all(
         AppColors.lightLightBlue100,
       ),
     ),
   ),
-
+  inputDecorationTheme: _base.inputDecorationTheme.copyWith(
+    hintStyle: _base.primaryTextTheme.bodyText1!.copyWith(
+      color: AppColors.darkWhite60,
+      fontWeight: FontWeight.w500,
+      fontSize: 16,
+      height: 1.25,
+    ),
+    errorStyle: const TextStyle(
+      color: AppColors.darkPink100,
+    ),
+    border: const UnderlineInputBorder(
+      borderSide: BorderSide(color: AppColors.darkWhite60, width: 1),
+    ),
+    focusedBorder: const UnderlineInputBorder(
+      borderSide: BorderSide(color: AppColors.darkWhite60, width: 2),
+    ),
+    errorBorder: const UnderlineInputBorder(
+      borderSide: BorderSide(color: AppColors.darkPink100, width: 2),
+    ),
+    labelStyle: _base.primaryTextTheme.bodyText1!.copyWith(
+      color: AppColors.darkWhite60,
+      fontWeight: FontWeight.w500,
+      fontSize: 16,
+      height: 1.25,
+    ),
+    floatingLabelStyle: const TextStyle(
+      color: AppColors.darkDarkBlue100,
+      fontWeight: FontWeight.w400,
+      fontSize: 12,
+    ),
+  ),
+  textSelectionTheme: _base.textSelectionTheme.copyWith(
+    cursorColor: AppColors.darkDarkBlue100,
+    selectionHandleColor: AppColors.lightLightBlue100,
+  ),
 );
