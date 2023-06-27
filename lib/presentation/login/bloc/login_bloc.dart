@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../data/model/request_error.dart';
@@ -17,8 +18,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginEmailChanged>(_emailChanged);
     on<LoginPasswordChanged>(_passwordChanged);
     on<LoginRequestErrorShowed>(_requestErrorShowed);
-
   }
+
+  static final _passwordRegexp =
+      RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
 
   FutureOr<void> _loginButtonClicked(
     LoginLoginButtonClicked event,
@@ -59,7 +62,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   FutureOr<void> _emailChanged(
       LoginEmailChanged event, Emitter<LoginState> emit) {
     final newEmail = event.email;
-    final emailValid = newEmail.length > 4;
+    final emailValid = _emailValid(newEmail);
     emit(state.copyWith(
       email: newEmail,
       emailValid: emailValid,
@@ -68,10 +71,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     ));
   }
 
+  bool _emailValid(final String email) {
+    return EmailValidator.validate(email);
+  }
+
   FutureOr<void> _passwordChanged(
       LoginPasswordChanged event, Emitter<LoginState> emit) {
     final newPassword = event.password;
-    final passwordValid = newPassword.length >= 8;
+    final passwordValid = _passwordValid(newPassword);
     emit(state.copyWith(
       password: newPassword,
       passwordValid: passwordValid,
@@ -80,16 +87,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     ));
   }
 
-  FutureOr<void> _requestErrorShowed(
-      LoginRequestErrorShowed event, Emitter<LoginState> emit) {
-
-    emit(state.copyWith(
-      requestError: RequestError.noError
-    ));
+  bool _passwordValid(final String password) {
+    return _passwordRegexp.hasMatch(password);
   }
 
-
-
+  FutureOr<void> _requestErrorShowed(
+      LoginRequestErrorShowed event, Emitter<LoginState> emit) {
+    emit(state.copyWith(requestError: RequestError.noError));
+  }
 
   @override
   void onEvent(LoginEvent event) {
