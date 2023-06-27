@@ -52,7 +52,7 @@ class _AvatarWidget extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding:
-          const EdgeInsets.only(left: 8, top: 6, bottom: 6, right: 4),
+      const EdgeInsets.only(left: 8, top: 6, bottom: 6, right: 4),
       decoration: BoxDecoration(
         color: context.dynamicPlainColor(
           lightThemeColor: AppColors.lightLightBlue100,
@@ -62,10 +62,18 @@ class _AvatarWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SvgPicture.network(
-            "https://api.dicebear.com/6.x/pixel-art/svg",
-            height: 48,
-            width: 48,
+          BlocBuilder<RegistrationBloc, RegistrationState>(
+            buildWhen: (_, current) {
+              return current is RegistrationFieldsInfo;
+            },
+            builder: (context, state) {
+              final fieldsInfo = state as RegistrationFieldsInfo;
+              return SvgPicture.network(
+                fieldsInfo.avatarLink,
+                height: 48,
+                width: 48,
+              );
+            },
           ),
           const SizedBox(
             width: 8,
@@ -81,8 +89,8 @@ class _AvatarWidget extends StatelessWidget {
           TextButton(
             onPressed: () {
               context.read<RegistrationBloc>().add(
-                    const RegistrationChangeAvatar(),
-                  );
+                const RegistrationChangeAvatar(),
+              );
             },
             child: Text("Изменить"),
           ),
