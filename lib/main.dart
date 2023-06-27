@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gifts_manager/presentation/login/view/login_page.dart';
+import 'package:gifts_manager/presentation/splash/view/splash_page.dart';
 import 'package:gifts_manager/presentation/theme/theme.dart';
 
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.light,
-      home: LoginPage(),
+      home: const SplashPage(),
     );
   }
 }

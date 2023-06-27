@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gifts_manager/data/model/request_error.dart';
+import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/presentation/registration/model/errors.dart';
 import 'package:meta/meta.dart';
 
@@ -47,7 +48,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     on<RegistrationPasswordChanged>(_onChangePassword);
     on<RegistrationPasswordFocusLost>(_onPasswordFocusLost);
     on<RegistrationPasswordConfirmationChanged>(_onChangePasswordConfirmation);
-    on<RegistrationPasswordConfirmationFocusLost>(_onPasswordConfirmationFocusLost);
+    on<RegistrationPasswordConfirmationFocusLost>(
+        _onPasswordConfirmationFocusLost);
     on<RegistrationNameChanged>(_onChangeName);
     on<RegistrationNameFocusLost>(_onNameFocusLost);
     on<RegistrationCreateAccount>(_onCreateAccount);
@@ -56,12 +58,28 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   FutureOr<void> _onCreateAccount(
     final RegistrationCreateAccount event,
     final Emitter<RegistrationState> emit,
-  ) {
+  ) async {
     _highlightEmailError = true;
     _highlightPasswordError = true;
     _highlightPasswordConfirmationError = true;
     _highlightNameError = true;
     emit(_calculateFieldsInfo());
+    final haveError = _emailError != null ||
+        _passwordError != null ||
+        _passwordConfirmationError != null ||
+        _nameError != null;
+    if (haveError) {
+      return;
+    }
+    emit(const RegistrationInProgress());
+    final token = await register();
+    await SharedPreferenceData.getInstance().setToken(token);
+    emit(const RegistrationCompleted());
+  }
+
+  Future<String> register() async {
+    await Future.delayed(Duration(seconds: 2));
+    return "token";
   }
 
   FutureOr<void> _onChangeAvatar(
@@ -158,18 +176,18 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   }
 
   FutureOr<void> _onChangeName(
-      final RegistrationNameChanged event,
-      final Emitter<RegistrationState> emit,
-      ) {
+    final RegistrationNameChanged event,
+    final Emitter<RegistrationState> emit,
+  ) {
     _name = event.name;
     _nameError = _validateName();
     emit(_calculateFieldsInfo());
   }
 
   FutureOr<void> _onNameFocusLost(
-      final RegistrationNameFocusLost event,
-      final Emitter<RegistrationState> emit,
-      ) {
+    final RegistrationNameFocusLost event,
+    final Emitter<RegistrationState> emit,
+  ) {
     _highlightNameError = true;
     emit(_calculateFieldsInfo());
   }

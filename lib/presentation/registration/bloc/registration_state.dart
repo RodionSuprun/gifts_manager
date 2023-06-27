@@ -47,3 +47,11 @@ class RegistrationInProgress extends RegistrationState {
   @override
   List<Object?> get props => [];
 }
+
+class RegistrationCompleted extends RegistrationState {
+
+  const RegistrationCompleted();
+
+  @override
+  List<Object?> get props => [];
+}
