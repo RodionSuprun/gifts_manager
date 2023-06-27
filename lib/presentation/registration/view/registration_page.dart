@@ -31,12 +31,21 @@ class _RegistrationPageWidget extends StatefulWidget {
 class _RegistrationPageWidgetState extends State<_RegistrationPageWidget> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          _AvatarWidget()
-        ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                children: [
+                  _AvatarWidget(),
+                ],
+              ),
+            ),
+            _RegistrationButton(),
+          ],
+        ),
       ),
     );
   }
@@ -51,8 +60,7 @@ class _AvatarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding:
-      const EdgeInsets.only(left: 8, top: 6, bottom: 6, right: 4),
+      padding: const EdgeInsets.only(left: 8, top: 6, bottom: 6, right: 4),
       decoration: BoxDecoration(
         color: context.dynamicPlainColor(
           lightThemeColor: AppColors.lightLightBlue100,
@@ -89,12 +97,47 @@ class _AvatarWidget extends StatelessWidget {
           TextButton(
             onPressed: () {
               context.read<RegistrationBloc>().add(
-                const RegistrationChangeAvatar(),
-              );
+                    const RegistrationChangeAvatar(),
+                  );
             },
             child: Text("Изменить"),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RegistrationButton extends StatelessWidget {
+  const _RegistrationButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: SizedBox(
+        width: double.infinity,
+        child: BlocSelector<RegistrationBloc, RegistrationState, bool>(
+          selector: (state) {
+            return state is RegistrationInProgress;
+          },
+          builder: (context, inProgress) {
+            return ElevatedButton(
+              onPressed: inProgress
+                  ? null
+                  : () {
+                      context
+                          .read<RegistrationBloc>()
+                          .add(const RegistrationCreateAccount());
+                    },
+              child: const Text(
+                "Создать",
+              ),
+            );
+          },
+        ),
       ),
     );
   }

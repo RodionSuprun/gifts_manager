@@ -171,10 +171,6 @@ class _LoginButton extends StatelessWidget {
                   : null,
               child: const Text(
                 "Войти",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
               ),
               // style: ButtonStyle(
               //   backgroundColor: MaterialStateProperty.resolveWith((states) {
