@@ -10,7 +10,7 @@ part 'registration_event.dart';
 part 'registration_state.dart';
 
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
-  RegistrationBloc() : super(RegistrationInitial()) {
+  RegistrationBloc() : super(RegistrationFieldsInfo(avatarLink: "avatarLink")) {
     on<RegistrationEvent>((event, emit) {
       // TODO: implement event handler
     });
