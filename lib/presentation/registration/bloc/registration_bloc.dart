@@ -28,12 +28,32 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   bool _highlightPasswordError = false;
   RegistrationPasswordError? _passwordError;
 
+  String _passwordConfirmation = "";
+  bool _highlightPasswordConfirmationError = false;
+  RegistrationPasswordConfirmationError? _passwordConfirmationError;
+
+  String _name = "";
+  bool _highlightNameError = false;
+  RegistrationNameError? _nameError;
+
   RegistrationBloc()
       : super(RegistrationFieldsInfo(
             avatarLink: _avatarBuilder(defaultAvatarKey))) {
     on<RegistrationChangeAvatar>(_onChangeAvatar);
     on<RegistrationEmailChanged>(_onChangeEmail);
     on<RegistrationEmailFocusLost>(_onEmailFocusLost);
+    on<RegistrationCreateAccount>(_onCreateAccount);
+  }
+
+  FutureOr<void> _onCreateAccount(
+      final RegistrationCreateAccount event,
+      final Emitter<RegistrationState> emit,
+      ) {
+    _highlightEmailError = true;
+    _highlightPasswordError = true;
+    _highlightPasswordConfirmationError = true;
+    _highlightNameError = true;
+    emit(_calculateFieldsInfo());
   }
 
   FutureOr<void> _onEmailFocusLost(
