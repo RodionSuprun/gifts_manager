@@ -13,6 +13,8 @@ import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/presentation/registration/model/errors.dart';
 import 'package:meta/meta.dart';
 
+import '../../../data/http/unauthorized_api_service.dart';
+
 part 'registration_event.dart';
 
 part 'registration_state.dart';
@@ -82,40 +84,15 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   }
 
   Future<String> register() async {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: "https://giftmanager.skill-branch.ru/api",
-      ),
-    );
-    if (kDebugMode) {
-      dio.interceptors.add(
-        LogInterceptor(
-          request: true,
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          responseBody: true,
-          error: true,
-        ),
-      );
-    }
-
-    final requestBody = CreateAccountRequestDTO(
-      email: _email,
-      name: _name,
-      password: _password,
-      avatarUrl: _avatarBuilder(_avatarKey),
-    );
 
     try {
-      final response = await dio.post(
-        "/auth/create",
-        data: requestBody.toJson(),
+      final response = await UnauthorizedApiService.getInstance().register(
+        email: _email,
+        password: _password,
+        name: _name,
+        avatarUrl: _avatarBuilder(_avatarKey),
       );
-
-      final userWithTokens = UserWithTokenDTO.fromJson(response.data);
-
-      return userWithTokens.token;
+      return response?.token ?? "";
     } catch (e) {}
 
     return "token";
