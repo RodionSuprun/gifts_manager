@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gifts_manager/data/model/request_error.dart';
 import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/presentation/registration/model/errors.dart';
@@ -78,7 +80,33 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   }
 
   Future<String> register() async {
-    await Future.delayed(Duration(seconds: 2));
+    final dio = Dio();
+    if (kDebugMode) {
+      dio.interceptors.add(
+        LogInterceptor(
+          request: true,
+          requestHeader: true,
+          requestBody: true,
+          responseHeader: true,
+          responseBody: true,
+          error: true,
+        ),
+      );
+    }
+
+    final response = await dio.post(
+      "https://giftmanager.skill-branch.ru/api/auth/create",
+      data: '''{
+      "email": "test99@test.test",
+      "name": "Test",
+      "password": "123456",
+      "avatar-url": "ge"
+      }
+      
+      ''',
+    );
+
+    print(response);
     return "token";
   }
 
