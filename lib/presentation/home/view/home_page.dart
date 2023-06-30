@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gifts_manager/data/repository/token_repository.dart';
 import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/presentation/login/view/login_page.dart';
 
@@ -18,7 +19,7 @@ class HomePage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                await SharedPreferenceData.getInstance().setToken(null);
+                await TokenRepository.getInstance().setItem(null);
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const LoginPage()),
                   (route) => false,

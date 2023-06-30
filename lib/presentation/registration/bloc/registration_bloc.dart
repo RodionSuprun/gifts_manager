@@ -9,6 +9,9 @@ import 'package:flutter/foundation.dart';
 import 'package:gifts_manager/data/http/model/create_account_request_dto.dart';
 import 'package:gifts_manager/data/http/model/user_with_tokens_dto.dart';
 import 'package:gifts_manager/data/model/request_error.dart';
+import 'package:gifts_manager/data/repository/refresh_token_repository.dart';
+import 'package:gifts_manager/data/repository/token_repository.dart';
+import 'package:gifts_manager/data/repository/user_repository.dart';
 import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/presentation/registration/model/errors.dart';
 import 'package:meta/meta.dart';
@@ -78,24 +81,25 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       return;
     }
     emit(const RegistrationInProgress());
-    final token = await register();
-    await SharedPreferenceData.getInstance().setToken(token);
-    emit(const RegistrationCompleted());
+    final response = await register();
+    if (response == null) {
+
+    } else {
+      await UserRepository.getInstance().setItem(response.user);
+      await TokenRepository.getInstance().setItem(response.token);
+      await RefreshTokenRepository.getInstance().setItem(response.refreshToken);
+      emit(const RegistrationCompleted());
+    }
   }
 
-  Future<String> register() async {
-
-    try {
-      final response = await UnauthorizedApiService.getInstance().register(
-        email: _email,
-        password: _password,
-        name: _name,
-        avatarUrl: _avatarBuilder(_avatarKey),
-      );
-      return response?.token ?? "";
-    } catch (e) {}
-
-    return "token";
+  Future<UserWithTokenDTO?> register() async {
+    final response = await UnauthorizedApiService.getInstance().register(
+      email: _email,
+      password: _password,
+      name: _name,
+      avatarUrl: _avatarBuilder(_avatarKey),
+    );
+    return response;
   }
 
   FutureOr<void> _onChangeAvatar(
