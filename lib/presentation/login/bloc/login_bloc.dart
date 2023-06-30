@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:either_dart/either.dart';
@@ -26,6 +25,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginEmailChanged>(_emailChanged);
     on<LoginPasswordChanged>(_passwordChanged);
     on<LoginRequestErrorShowed>(_requestErrorShowed);
+    on<LoginAfterResetPassword>(_afterResetPassword);
   }
 
   // static final _passwordRegexp =
@@ -107,7 +107,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   FutureOr<void> _requestErrorShowed(
       LoginRequestErrorShowed event, Emitter<LoginState> emit) {
     emit(state.copyWith(requestError: RequestError.noError));
+    emit(state.copyWith(showAfterPassword: false));
   }
+
+  FutureOr<void> _afterResetPassword(
+      LoginAfterResetPassword event, Emitter<LoginState> emit) {
+    emit(state.copyWith(showAfterPassword: true));
+  }
+
 
   @override
   void onEvent(LoginEvent event) {

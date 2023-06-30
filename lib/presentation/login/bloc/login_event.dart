@@ -37,3 +37,10 @@ class LoginRequestErrorShowed  extends LoginEvent {
   @override
   List<Object?> get props => [];
 }
+
+class LoginAfterResetPassword  extends LoginEvent {
+  const LoginAfterResetPassword();
+
+  @override
+  List<Object?> get props => [];
+}

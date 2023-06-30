@@ -9,6 +9,7 @@ class LoginState extends Equatable {
   final bool passwordValid;
   final bool authenticated;
   final RequestError requestError;
+  final bool showAfterPassword;
 
   const LoginState({
     required this.email,
@@ -19,6 +20,7 @@ class LoginState extends Equatable {
     required this.passwordValid,
     required this.authenticated,
     required this.requestError,
+    required this.showAfterPassword,
   });
 
   bool get allFieldsValid => emailValid && passwordValid;
@@ -32,7 +34,8 @@ class LoginState extends Equatable {
         emailValid,
         passwordValid,
         authenticated,
-        requestError
+        requestError,
+        showAfterPassword,
       ];
 
   factory LoginState.initial() => const LoginState(
@@ -44,6 +47,7 @@ class LoginState extends Equatable {
         passwordValid: false,
         authenticated: false,
         requestError: RequestError.noError,
+        showAfterPassword: false,
       );
 
   LoginState copyWith({
@@ -55,6 +59,7 @@ class LoginState extends Equatable {
     final bool? passwordValid,
     final bool? authenticated,
     final RequestError? requestError,
+    final bool? showAfterPassword,
   }) {
     return LoginState(
       email: email ?? this.email,
@@ -65,6 +70,7 @@ class LoginState extends Equatable {
       passwordValid: passwordValid ?? this.passwordValid,
       authenticated: authenticated ?? this.authenticated,
       requestError: requestError ?? this.requestError,
+      showAfterPassword: showAfterPassword ?? this.showAfterPassword,
     );
   }
 }

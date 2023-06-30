@@ -2,19 +2,16 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gifts_manager/data/http/model/api_error.dart';
-import 'package:gifts_manager/data/http/model/create_account_request_dto.dart';
 import 'package:gifts_manager/data/http/model/user_with_tokens_dto.dart';
 import 'package:gifts_manager/data/model/request_error.dart';
 import 'package:gifts_manager/data/repository/refresh_token_repository.dart';
 import 'package:gifts_manager/data/repository/token_repository.dart';
 import 'package:gifts_manager/data/repository/user_repository.dart';
-import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/presentation/registration/model/errors.dart';
 import 'package:meta/meta.dart';
 
@@ -64,6 +61,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     on<RegistrationNameChanged>(_onChangeName);
     on<RegistrationNameFocusLost>(_onNameFocusLost);
     on<RegistrationCreateAccount>(_onCreateAccount);
+    on<RegistrationRequestErrorShowed>(_requestErrorShowed);
   }
 
   FutureOr<void> _onCreateAccount(
@@ -88,10 +86,11 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       final userWithToken = response.right;
       await UserRepository.getInstance().setItem(userWithToken.user);
       await TokenRepository.getInstance().setItem(userWithToken.token);
-      await RefreshTokenRepository.getInstance().setItem(userWithToken.refreshToken);
+      await RefreshTokenRepository.getInstance()
+          .setItem(userWithToken.refreshToken);
       emit(const RegistrationCompleted());
     } else {
-
+      emit(const RegistrationErrorState(RequestError.unknown));
     }
   }
 
@@ -232,5 +231,12 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
           : null,
       nameError: _highlightNameError ? _nameError : null,
     );
+  }
+
+  FutureOr<void> _requestErrorShowed(
+      RegistrationRequestErrorShowed event,
+      Emitter<RegistrationState> emit,
+      ) {
+    emit(const RegistrationErrorState(RequestError.noError));
   }
 }

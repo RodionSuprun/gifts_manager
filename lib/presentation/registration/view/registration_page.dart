@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gifts_manager/data/model/request_error.dart';
 import 'package:gifts_manager/extensions/build_context.dart';
 import 'package:gifts_manager/extensions/theme_extension.dart';
 import 'package:gifts_manager/presentation/registration/bloc/registration_bloc.dart';
-import 'package:gifts_manager/presentation/registration/model/errors.dart';
 import 'package:gifts_manager/resources/app_colors.dart';
 
 import '../../home/view/home_page.dart';
@@ -90,15 +90,39 @@ class _RegistrationPageWidgetState extends State<_RegistrationPageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<RegistrationBloc, RegistrationState>(
-      listener: (context, state) {
-        if (state is RegistrationCompleted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const HomePage()),
-            (route) => false,
-          );
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<RegistrationBloc, RegistrationState>(
+          listener: (context, state) {
+            if (state is RegistrationCompleted) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false,
+              );
+            }
+          },
+        ),
+        BlocListener<RegistrationBloc, RegistrationState>(
+          listener: (context, state) {
+            if (state is RegistrationErrorState) {
+              if (state.requestError == RequestError.unknown) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Произошла ошибка".toUpperCase(),
+                    ),
+                    margin:
+                        const EdgeInsets.only(left: 16, right: 16, bottom: 96),
+                  ),
+                );
+                context
+                    .read<RegistrationBloc>()
+                    .add(RegistrationRequestErrorShowed());
+              }
+            }
+          },
+        ),
+      ],
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(),

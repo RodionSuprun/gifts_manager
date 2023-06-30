@@ -6,6 +6,7 @@ import 'package:gifts_manager/presentation/home/view/home_page.dart';
 import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
 import 'package:gifts_manager/presentation/login/model/models.dart';
 import 'package:gifts_manager/presentation/registration/view/registration_page.dart';
+import 'package:gifts_manager/presentation/reset_password/view/reset_password_page.dart';
 import 'package:gifts_manager/resources/app_colors.dart';
 
 class LoginPage extends StatelessWidget {
@@ -80,6 +81,20 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
             }
           },
         ),
+        BlocListener<LoginBloc, LoginState>(
+          listener: (context, state) {
+            if (state.showAfterPassword) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Проверьте почту, мы отправили вам письмо для сборса пароля",
+                  ),
+                ),
+              );
+              context.read<LoginBloc>().add(LoginRequestErrorShowed());
+            }
+          },
+        ),
       ],
       child: Column(
         children: [
@@ -135,7 +150,20 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
           ),
           const SizedBox(height: 8),
           TextButton(
-            onPressed: () {},
+            onPressed: () async{
+              final resetPasswordResult = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const ResetPasswordPage();
+                  },
+                ),
+              );
+              if (resetPasswordResult == true) {
+                context
+                    .read<LoginBloc>()
+                    .add(const LoginAfterResetPassword());
+              }
+            },
             child: const Text("Не помню пароль"),
           ),
           const Spacer(flex: 284),
@@ -172,20 +200,6 @@ class _LoginButton extends StatelessWidget {
               child: const Text(
                 "Войти",
               ),
-              // style: ButtonStyle(
-              //   backgroundColor: MaterialStateProperty.resolveWith((states) {
-              //     if (states.contains(MaterialState.disabled)) {
-              //       return Color.fromRGBO(54, 110, 196, 0.7);
-              //     }
-              //     return Color.fromRGBO(41, 80, 175, 1);
-              //   }),
-              //   textStyle: MaterialStateProperty.all(
-              //     TextStyle(
-              //       color: Colors.white,
-              //       fontSize: 16,
-              //     ),
-              //   ),
-              // ),
             );
           },
         ),

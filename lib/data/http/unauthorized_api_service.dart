@@ -7,6 +7,7 @@ import 'package:gifts_manager/data/http/model/login_request_dto.dart';
 import 'package:gifts_manager/data/http/model/user_with_tokens_dto.dart';
 
 import 'model/create_account_request_dto.dart';
+import 'model/reset_password_request_dto.dart';
 
 class UnauthorizedApiService {
   static UnauthorizedApiService? _instance;
@@ -57,6 +58,25 @@ class UnauthorizedApiService {
     try {
       final response = await _dio.post(
         "/auth/login",
+        data: requestBody.toJson(),
+      );
+
+      final userWithTokens = UserWithTokenDTO.fromJson(response.data);
+      return Right(userWithTokens);
+    } catch (e) {
+      return Left(_getApiError(e));
+    }
+  }
+
+  Future<Either<ApiError, UserWithTokenDTO>> resetPassword(
+      {required final String email}) async {
+    final requestBody = ResetPasswordRequestDTO(
+      email: email,
+    );
+
+    try {
+      final response = await _dio.post(
+        "/auth/reset-password",
         data: requestBody.toJson(),
       );
 

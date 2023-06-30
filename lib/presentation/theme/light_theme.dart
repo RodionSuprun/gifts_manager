@@ -124,10 +124,26 @@ final lightTheme = _base.copyWith(
     cursorColor: AppColors.lightDarkBlue100,
     selectionHandleColor: AppColors.lightLightBlue100,
   ),
-
   appBarTheme: const AppBarTheme(
     elevation: 0,
     backgroundColor: AppColors.lightWhite100,
     foregroundColor: AppColors.lightDarkBlue100,
-  )
+  ),
+  snackBarTheme: const SnackBarThemeData(
+    backgroundColor: AppColors.lightGrey100,
+    showCloseIcon: true,
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(8),
+      ),
+    ),
+    contentTextStyle: TextStyle(
+      fontSize: 14,
+      height: 1.15,
+      fontWeight: FontWeight.w500,
+      color: AppColors.lightWhite100,
+    ),
+    closeIconColor: AppColors.outline,
+  ),
 );
