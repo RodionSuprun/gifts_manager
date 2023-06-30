@@ -3,9 +3,11 @@ import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
+import 'package:either_dart/either.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gifts_manager/data/http/model/api_error.dart';
 import 'package:gifts_manager/data/http/model/create_account_request_dto.dart';
 import 'package:gifts_manager/data/http/model/user_with_tokens_dto.dart';
 import 'package:gifts_manager/data/model/request_error.dart';
@@ -82,17 +84,18 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     }
     emit(const RegistrationInProgress());
     final response = await register();
-    if (response == null) {
-
-    } else {
-      await UserRepository.getInstance().setItem(response.user);
-      await TokenRepository.getInstance().setItem(response.token);
-      await RefreshTokenRepository.getInstance().setItem(response.refreshToken);
+    if (response.isRight) {
+      final userWithToken = response.right;
+      await UserRepository.getInstance().setItem(userWithToken.user);
+      await TokenRepository.getInstance().setItem(userWithToken.token);
+      await RefreshTokenRepository.getInstance().setItem(userWithToken.refreshToken);
       emit(const RegistrationCompleted());
+    } else {
+
     }
   }
 
-  Future<UserWithTokenDTO?> register() async {
+  Future<Either<ApiError, UserWithTokenDTO>> register() async {
     final response = await UnauthorizedApiService.getInstance().register(
       email: _email,
       password: _password,
