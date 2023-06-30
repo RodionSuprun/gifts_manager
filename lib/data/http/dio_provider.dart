@@ -6,6 +6,9 @@ class DioProvider {
     final dio = Dio(
       BaseOptions(
         baseUrl: "https://giftmanager.skill-branch.ru/api",
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+        sendTimeout: const Duration(seconds: 5),
       ),
     );
     if (kDebugMode) {
