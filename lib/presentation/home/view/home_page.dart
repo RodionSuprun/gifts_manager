@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gifts_manager/data/http/model/user_dto.dart';
 import 'package:gifts_manager/data/repository/token_repository.dart';
 import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/presentation/login/view/login_page.dart';
+
+import '../../../data/repository/user_repository.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,7 +16,15 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            const Text("HomePage"),
+            StreamBuilder<UserDto?>(
+              stream: UserRepository.getInstance().observeItem(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData  || snapshot.data == null) {
+                  return const Text("HomePage");
+                }
+                return Text(snapshot.data.toString());
+              }
+            ),
             const SizedBox(
               height: 42,
             ),

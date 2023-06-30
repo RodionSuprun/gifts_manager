@@ -4,8 +4,13 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:equatable/equatable.dart';
+import 'package:gifts_manager/data/http/unauthorized_api_service.dart';
 
+import '../../../data/http/model/user_with_tokens_dto.dart';
 import '../../../data/model/request_error.dart';
+import '../../../data/repository/refresh_token_repository.dart';
+import '../../../data/repository/token_repository.dart';
+import '../../../data/repository/user_repository.dart';
 import '../model/models.dart';
 
 part 'login_event.dart';
@@ -20,8 +25,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginRequestErrorShowed>(_requestErrorShowed);
   }
 
-  static final _passwordRegexp =
-      RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
+  // static final _passwordRegexp =
+  //     RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
 
   FutureOr<void> _loginButtonClicked(
     LoginLoginButtonClicked event,
@@ -30,33 +35,36 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (state.allFieldsValid) {
       final response =
           await _login(email: state.email, password: state.password);
-      if (response == null) {
+      if (response != null) {
+        await UserRepository.getInstance().setItem(response.user);
+        await TokenRepository.getInstance().setItem(response.token);
+        await RefreshTokenRepository.getInstance().setItem(response.refreshToken);
         emit(state.copyWith(authenticated: true));
       } else {
-        switch (response) {
-          case LoginError.emailNotExist:
-            emit(state.copyWith(emailError: EmailError.notExist));
-            break;
-          case LoginError.wrongPassword:
-            emit(state.copyWith(passwordError: PasswordError.wrongPassword));
-            break;
-          case LoginError.other:
-            emit(state.copyWith(requestError: RequestError.unknown));
-            break;
-        }
+        // switch (response) {
+        //   case LoginError.emailNotExist:
+        //     emit(state.copyWith(emailError: EmailError.notExist));
+        //     break;
+        //   case LoginError.wrongPassword:
+        //     emit(state.copyWith(passwordError: PasswordError.wrongPassword));
+        //     break;
+        //   case LoginError.other:
+        //     emit(state.copyWith(requestError: RequestError.unknown));
+        //     break;
+        // }
       }
     }
   }
 
-  Future<LoginError?> _login({
+  Future<UserWithTokenDTO?> _login({
     required final String email,
     required final String password,
   }) async {
-    final successfulResponse = Random().nextBool();
-    if (successfulResponse) {
-      return null;
-    }
-    return LoginError.values[Random().nextInt(LoginError.values.length)];
+    final response = await UnauthorizedApiService.getInstance().login(
+      email: email,
+      password: password,
+    );
+    return response;
   }
 
   FutureOr<void> _emailChanged(
@@ -88,7 +96,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   bool _passwordValid(final String password) {
-    return _passwordRegexp.hasMatch(password);
+    return password.length > 5;
   }
 
   FutureOr<void> _requestErrorShowed(

@@ -23,5 +23,5 @@ class UserDto extends Equatable {
   Map<String, dynamic> toJson() => _$UserDtoToJson(this);
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [id, name, email, avatarUrl];
 }
