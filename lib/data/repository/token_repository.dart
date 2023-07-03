@@ -1,16 +1,13 @@
+import 'package:gifts_manager/data/repository/token_provider.dart';
+
 import '../../di/service_locator.dart';
 import '../storage/shared_preference_data.dart';
 import 'base/reactive_repository.dart';
 
 class TokenRepository extends ReactiveRepository<String> {
-  static TokenRepository? _instance;
+  TokenRepository(this._tokenProvider);
 
-  factory TokenRepository.getInstance() => _instance ??=
-      TokenRepository._internal(sl.get<SharedPreferenceData>());
-
-  TokenRepository._internal(this._spData);
-
-  final SharedPreferenceData _spData;
+  final TokenProvider _tokenProvider;
 
   @override
   String convertFromString(String rawItem) => rawItem;
@@ -19,8 +16,8 @@ class TokenRepository extends ReactiveRepository<String> {
   String convertToString(String item) => item;
 
   @override
-  Future<String?> getRawData() => _spData.getToken();
+  Future<String?> getRawData() => _tokenProvider.getToken();
 
   @override
-  Future<bool> saveRawData(String? item) => _spData.setToken(item);
+  Future<bool> saveRawData(String? item) => _tokenProvider.setToken(item);
 }

@@ -16,6 +16,7 @@ import 'package:gifts_manager/presentation/registration/model/errors.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/http/unauthorized_api_service.dart';
+import '../../../di/service_locator.dart';
 
 part 'registration_event.dart';
 
@@ -84,9 +85,10 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     final response = await register();
     if (response.isRight) {
       final userWithToken = response.right;
-      await UserRepository.getInstance().setItem(userWithToken.user);
-      await TokenRepository.getInstance().setItem(userWithToken.token);
-      await RefreshTokenRepository.getInstance()
+      await sl.get<UserRepository>().setItem(userWithToken.user);
+      await sl.get<TokenRepository>().setItem(userWithToken.token);
+      await sl
+          .get<RefreshTokenRepository>()
           .setItem(userWithToken.refreshToken);
       emit(const RegistrationCompleted());
     } else {
@@ -234,9 +236,9 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   }
 
   FutureOr<void> _requestErrorShowed(
-      RegistrationRequestErrorShowed event,
-      Emitter<RegistrationState> emit,
-      ) {
+    RegistrationRequestErrorShowed event,
+    Emitter<RegistrationState> emit,
+  ) {
     emit(const RegistrationErrorState(RequestError.noError));
   }
 }

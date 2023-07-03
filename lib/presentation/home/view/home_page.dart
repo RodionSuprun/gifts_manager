@@ -5,6 +5,7 @@ import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/presentation/login/view/login_page.dart';
 
 import '../../../data/repository/user_repository.dart';
+import '../../../di/service_locator.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class HomePage extends StatelessWidget {
         child: Column(
           children: [
             StreamBuilder<UserDto?>(
-              stream: UserRepository.getInstance().observeItem(),
+              stream: sl.get<UserRepository>().observeItem(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData  || snapshot.data == null) {
                   return const Text("HomePage");
@@ -30,7 +31,7 @@ class HomePage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                await TokenRepository.getInstance().setItem(null);
+                await sl.get<TokenRepository>().setItem(null);
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const LoginPage()),
                   (route) => false,

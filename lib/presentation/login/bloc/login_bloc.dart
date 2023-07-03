@@ -13,6 +13,7 @@ import '../../../data/model/request_error.dart';
 import '../../../data/repository/refresh_token_repository.dart';
 import '../../../data/repository/token_repository.dart';
 import '../../../data/repository/user_repository.dart';
+import '../../../di/service_locator.dart';
 import '../model/models.dart';
 
 part 'login_event.dart';
@@ -40,9 +41,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           await _login(email: state.email, password: state.password);
       if (response.isRight) {
         final userWithTokens = response.right;
-        await UserRepository.getInstance().setItem(userWithTokens.user);
-        await TokenRepository.getInstance().setItem(userWithTokens.token);
-        await RefreshTokenRepository.getInstance().setItem(userWithTokens.refreshToken);
+        await sl.get<UserRepository>().setItem(userWithTokens.user);
+        await sl.get<TokenRepository>().setItem(userWithTokens.token);
+        await sl.get<RefreshTokenRepository>().setItem(userWithTokens.refreshToken);
         emit(state.copyWith(authenticated: true));
       } else {
         final apiError = response.left;
