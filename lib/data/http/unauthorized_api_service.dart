@@ -8,14 +8,15 @@ import 'package:gifts_manager/data/http/model/api_error.dart';
 import 'package:gifts_manager/data/http/model/login_request_dto.dart';
 import 'package:gifts_manager/data/http/model/user_with_tokens_dto.dart';
 
+import 'base_api_service.dart';
 import 'model/create_account_request_dto.dart';
 import 'model/gifts_response_dto.dart';
 import 'model/reset_password_request_dto.dart';
 
-class UnauthorizedApiService {
-  UnauthorizedApiService();
+class UnauthorizedApiService extends BaseApiService {
+  final Dio _dio;
 
-  final Dio _dio = DioProvider().createDio();
+  UnauthorizedApiService(this._dio);
 
   Future<Either<ApiError, UserWithTokenDTO>> register({
     required final String email,
@@ -29,19 +30,15 @@ class UnauthorizedApiService {
       password: password,
       avatarUrl: avatarUrl,
     );
-
-    try {
+    return responseOrError(() async {
       final response = await _dio.post(
         "/auth/create",
         data: requestBody.toJson(),
       );
 
       final userWithTokens = UserWithTokenDTO.fromJson(response.data);
-
-      return Right(userWithTokens);
-    } catch (e) {
-      return Left(_getApiError(e));
-    }
+      return userWithTokens;
+    });
   }
 
   Future<Either<ApiError, UserWithTokenDTO>> login({
@@ -52,44 +49,15 @@ class UnauthorizedApiService {
       email: email,
       password: password,
     );
-
-    try {
+    return responseOrError(() async {
       final response = await _dio.post(
         "/auth/login",
         data: requestBody.toJson(),
       );
 
       final userWithTokens = UserWithTokenDTO.fromJson(response.data);
-      return Right(userWithTokens);
-    } catch (e) {
-      return Left(_getApiError(e));
-    }
-  }
-
-  Future<Either<ApiError, GiftsResponseDto>> getAllGifts({
-    required final String token,
-    final int limit = 10,
-    final int offset = 0,
-  }) async {
-    try {
-      final response = await _dio.get(
-        "/user/gifts",
-        queryParameters: {
-          'limit': limit,
-          'offset': offset,
-        },
-        options: Options(
-          headers: {
-            HttpHeaders.authorizationHeader: "Bearer $token",
-          },
-        ),
-      );
-
-      final giftsResponse = GiftsResponseDto.fromJson(response.data);
-      return Right(giftsResponse);
-    } catch (e) {
-      return Left(_getApiError(e));
-    }
+      return userWithTokens;
+    });
   }
 
   Future<Either<ApiError, UserWithTokenDTO>> resetPassword(
@@ -98,29 +66,14 @@ class UnauthorizedApiService {
       email: email,
     );
 
-    try {
+    return responseOrError(() async {
       final response = await _dio.post(
         "/auth/reset-password",
         data: requestBody.toJson(),
       );
 
       final userWithTokens = UserWithTokenDTO.fromJson(response.data);
-      return Right(userWithTokens);
-    } catch (e) {
-      return Left(_getApiError(e));
-    }
-  }
-
-  ApiError _getApiError(final dynamic e) {
-    if (e is DioException) {
-      if (e.type == DioExceptionType.badResponse && e.response != null) {
-        try {
-          return ApiError.fromJson(e.response!.data);
-        } catch (apiExp) {
-          return const ApiError(code: ApiErrorType.unknown);
-        }
-      }
-    }
-    return const ApiError(code: ApiErrorType.unknown);
+      return userWithTokens;
+    });
   }
 }

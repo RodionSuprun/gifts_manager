@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:gifts_manager/data/http/authorization_interceptor.dart';
+import 'package:gifts_manager/data/http/authorized_api_service.dart';
 import 'package:gifts_manager/data/http/dio_provider.dart';
 import 'package:gifts_manager/data/http/unauthorized_api_service.dart';
 import 'package:gifts_manager/data/repository/refresh_token_repository.dart';
@@ -39,7 +41,6 @@ void _setupDataProviders() {
   sl.registerLazySingleton<UserProvider>(
     () => sl.get<SharedPreferenceData>(),
   );
-  sl.registerLazySingleton(() => DioProvider());
 }
 
 //Only singletons
@@ -69,12 +70,26 @@ void _setupInteractors() {
 //Only singletons
 void _setupComplexInteractors() {}
 
-//Only singletons
 void _setupApiRelatedClasses() {
+  sl.registerFactory(() => DioBuilder());
+
   sl.registerLazySingleton(
-        () => UnauthorizedApiService(),
+    () => AuthorizationInterceptor(
+      tokenRepository: sl.get<TokenRepository>(),
+      logoutInteractor: sl.get<LogoutInteractor>(),
+    ),
   );
 
+  sl.registerLazySingleton(
+    () => UnauthorizedApiService(sl.get<DioBuilder>().build()),
+  );
+
+  sl.registerLazySingleton(
+    () => AuthorizedApiService(sl
+        .get<DioBuilder>()
+        .addAuthorizationInterceptor(sl.get<AuthorizationInterceptor>())
+        .build()),
+  );
 }
 
 //Only factories
@@ -108,15 +123,13 @@ void _setupBlocs() {
       userRepository: sl.get<UserRepository>(),
       tokenRepository: sl.get<TokenRepository>(),
       logoutInteractor: sl.get<LogoutInteractor>(),
-      unauthorizedApiService: sl.get<UnauthorizedApiService>(),
+      authorizedApiService: sl.get<AuthorizedApiService>(),
     ),
   );
 
   sl.registerFactory(
-        () => ResetPasswordBloc(
+    () => ResetPasswordBloc(
       unauthorizedApiService: sl.get<UnauthorizedApiService>(),
     ),
   );
-
-
 }

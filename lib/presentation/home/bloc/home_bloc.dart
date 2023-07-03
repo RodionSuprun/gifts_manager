@@ -8,6 +8,7 @@ import 'package:gifts_manager/data/http/model/user_dto.dart';
 import 'package:gifts_manager/data/http/unauthorized_api_service.dart';
 import 'package:gifts_manager/data/repository/token_repository.dart';
 
+import '../../../data/http/authorized_api_service.dart';
 import '../../../data/repository/user_repository.dart';
 import '../../../domain/logout_interactor.dart';
 
@@ -19,7 +20,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final UserRepository userRepository;
   final TokenRepository tokenRepository;
   final LogoutInteractor logoutInteractor;
-  final UnauthorizedApiService unauthorizedApiService;
+  final AuthorizedApiService authorizedApiService;
 
   late final StreamSubscription _logoutSubscription;
 
@@ -27,7 +28,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.userRepository,
     required this.tokenRepository,
     required this.logoutInteractor,
-    required this.unauthorizedApiService,
+    required this.authorizedApiService,
   }) : super(HomeInitial()) {
     on<HomePageLoaded>(_onHomePageLoaded);
     on<HomeLogoutPushed>(_onHomeLogoutPushed);
@@ -53,7 +54,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
 
     final giftsResponse =
-        await unauthorizedApiService.getAllGifts(token: token);
+        await authorizedApiService.getAllGifts();
 
     final gifts =
         giftsResponse.isRight ? giftsResponse.right.gifts : const <GiftDTO>[];
