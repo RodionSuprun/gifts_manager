@@ -12,16 +12,16 @@ import '../../../data/model/request_error.dart';
 import '../../registration/model/errors.dart';
 
 part 'reset_password_event.dart';
+
 part 'reset_password_state.dart';
 
 class ResetPasswordBloc extends Bloc<ResetPasswordEvent, ResetPasswordState> {
-
   String _email = "";
   bool _highlightEmailError = false;
   RegistrationEmailError? _emailError = RegistrationEmailError.empty;
+  UnauthorizedApiService unauthorizedApiService;
 
-
-  ResetPasswordBloc()
+  ResetPasswordBloc({required this.unauthorizedApiService})
       : super(const ResetPasswordFieldInfo()) {
     on<ResetPasswordEmailChanged>(_onChangeEmail);
     on<ResetPasswordEmailFocusLost>(_onEmailFocusLost);
@@ -30,18 +30,18 @@ class ResetPasswordBloc extends Bloc<ResetPasswordEvent, ResetPasswordState> {
   }
 
   FutureOr<void> _onChangeEmail(
-      final ResetPasswordEmailChanged event,
-      final Emitter<ResetPasswordState> emit,
-      ) {
+    final ResetPasswordEmailChanged event,
+    final Emitter<ResetPasswordState> emit,
+  ) {
     _email = event.email;
     _emailError = _validateEmail();
     emit(_calculateFieldsInfo());
   }
 
   FutureOr<void> _onEmailFocusLost(
-      final ResetPasswordEmailFocusLost event,
-      final Emitter<ResetPasswordState> emit,
-      ) {
+    final ResetPasswordEmailFocusLost event,
+    final Emitter<ResetPasswordState> emit,
+  ) {
     _highlightEmailError = true;
     emit(_calculateFieldsInfo());
   }
@@ -57,10 +57,9 @@ class ResetPasswordBloc extends Bloc<ResetPasswordEvent, ResetPasswordState> {
   }
 
   FutureOr<void> _onResetPassword(
-      final ResetPasswordAction event,
-      final Emitter<ResetPasswordState> emit,
-      ) async {
-
+    final ResetPasswordAction event,
+    final Emitter<ResetPasswordState> emit,
+  ) async {
     _highlightEmailError = true;
     emit(_calculateFieldsInfo());
     final haveError = _emailError != null;
@@ -78,7 +77,7 @@ class ResetPasswordBloc extends Bloc<ResetPasswordEvent, ResetPasswordState> {
   }
 
   Future<Either<ApiError, UserWithTokenDTO>> resetPassword() async {
-    final response = await UnauthorizedApiService.getInstance().resetPassword(
+    final response = await unauthorizedApiService.resetPassword(
       email: _email,
     );
     return response;
@@ -91,9 +90,9 @@ class ResetPasswordBloc extends Bloc<ResetPasswordEvent, ResetPasswordState> {
   }
 
   FutureOr<void> _requestErrorShowed(
-      ResetPasswordRequestErrorShowed event,
-      Emitter<ResetPasswordState> emit,
-      ) {
+    ResetPasswordRequestErrorShowed event,
+    Emitter<ResetPasswordState> emit,
+  ) {
     emit(const ResetPasswordErrorState(RequestError.noError));
   }
 }

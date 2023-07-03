@@ -5,6 +5,7 @@ import 'package:gifts_manager/extensions/theme_extension.dart';
 import 'package:gifts_manager/presentation/login/view/login_page.dart';
 
 import '../../../data/model/request_error.dart';
+import '../../../di/service_locator.dart';
 import '../bloc/reset_password_bloc.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ResetPasswordBloc(),
+      create: (context) => sl.get<ResetPasswordBloc>(),
       child: MultiBlocListener(
         listeners: [
           BlocListener<ResetPasswordBloc, ResetPasswordState>(

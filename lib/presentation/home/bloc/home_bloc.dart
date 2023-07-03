@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:gifts_manager/data/http/model/gift_dto.dart';
+import 'package:gifts_manager/data/http/model/gifts_response_dto.dart';
 import 'package:gifts_manager/data/http/model/user_dto.dart';
+import 'package:gifts_manager/data/http/unauthorized_api_service.dart';
 import 'package:gifts_manager/data/repository/token_repository.dart';
 
 import '../../../data/repository/user_repository.dart';
@@ -16,6 +19,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final UserRepository userRepository;
   final TokenRepository tokenRepository;
   final LogoutInteractor logoutInteractor;
+  final UnauthorizedApiService unauthorizedApiService;
 
   late final StreamSubscription _logoutSubscription;
 
@@ -23,6 +27,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.userRepository,
     required this.tokenRepository,
     required this.logoutInteractor,
+    required this.unauthorizedApiService,
   }) : super(HomeInitial()) {
     on<HomePageLoaded>(_onHomePageLoaded);
     on<HomeLogoutPushed>(_onHomeLogoutPushed);
@@ -34,7 +39,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         .listen((event) {
       _logout();
     });
-
   }
 
   FutureOr<void> _onHomePageLoaded(
@@ -42,11 +46,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final Emitter<HomeState> emit,
   ) async {
     final user = await userRepository.getItem();
-    if (user == null) {
+    final token = await tokenRepository.getItem();
+    if (user == null || token == null) {
       _logout();
       return;
     }
-    emit(HomeWithUser(user));
+
+    final giftsResponse =
+        await unauthorizedApiService.getAllGifts(token: token);
+
+    final gifts =
+        giftsResponse.isRight ? giftsResponse.right.gifts : const <GiftDTO>[];
+
+    emit(HomeWithUserInfo(user: user, gifts: gifts));
   }
 
   FutureOr<void> _onHomeLogoutPushed(
@@ -62,9 +74,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   FutureOr<void> _onHomeExternalLogout(
-      final HomeExternalLogout event,
-      final Emitter<HomeState> emit,
-      ) async {
+    final HomeExternalLogout event,
+    final Emitter<HomeState> emit,
+  ) async {
     emit(const HomeLogoutState());
   }
 

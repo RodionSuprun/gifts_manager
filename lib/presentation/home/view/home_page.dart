@@ -43,8 +43,8 @@ class HomePageWidget extends StatelessWidget {
             children: [
               BlocBuilder<HomeBloc, HomeState>(
                 builder: (context, state) {
-                  if (state is HomeWithUser) {
-                    return Text(state.user.toString());
+                  if (state is HomeWithUserInfo) {
+                    return Text("${state.user.toString()} \n\n ${state.gifts.toString()}");
                   }
                   return const Text("HomePage");
                 },

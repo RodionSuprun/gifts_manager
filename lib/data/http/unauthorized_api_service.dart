@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:gifts_manager/data/http/api_error_type.dart';
@@ -7,15 +9,11 @@ import 'package:gifts_manager/data/http/model/login_request_dto.dart';
 import 'package:gifts_manager/data/http/model/user_with_tokens_dto.dart';
 
 import 'model/create_account_request_dto.dart';
+import 'model/gifts_response_dto.dart';
 import 'model/reset_password_request_dto.dart';
 
 class UnauthorizedApiService {
-  static UnauthorizedApiService? _instance;
-
-  factory UnauthorizedApiService.getInstance() =>
-      _instance ??= UnauthorizedApiService._internal();
-
-  UnauthorizedApiService._internal();
+  UnauthorizedApiService();
 
   final Dio _dio = DioProvider().createDio();
 
@@ -63,6 +61,32 @@ class UnauthorizedApiService {
 
       final userWithTokens = UserWithTokenDTO.fromJson(response.data);
       return Right(userWithTokens);
+    } catch (e) {
+      return Left(_getApiError(e));
+    }
+  }
+
+  Future<Either<ApiError, GiftsResponseDto>> getAllGifts({
+    required final String token,
+    final int limit = 10,
+    final int offset = 0,
+  }) async {
+    try {
+      final response = await _dio.get(
+        "/user/gifts",
+        queryParameters: {
+          'limit': limit,
+          'offset': offset,
+        },
+        options: Options(
+          headers: {
+            HttpHeaders.authorizationHeader: "Bearer $token",
+          },
+        ),
+      );
+
+      final giftsResponse = GiftsResponseDto.fromJson(response.data);
+      return Right(giftsResponse);
     } catch (e) {
       return Left(_getApiError(e));
     }

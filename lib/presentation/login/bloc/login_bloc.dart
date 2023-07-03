@@ -13,7 +13,6 @@ import '../../../data/model/request_error.dart';
 import '../../../data/repository/refresh_token_repository.dart';
 import '../../../data/repository/token_repository.dart';
 import '../../../data/repository/user_repository.dart';
-import '../../../di/service_locator.dart';
 import '../model/models.dart';
 
 part 'login_event.dart';
@@ -24,11 +23,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final UserRepository userRepository;
   final TokenRepository tokenRepository;
   final RefreshTokenRepository refreshTokenRepository;
+  final UnauthorizedApiService unauthorizedApiService;
 
   LoginBloc({
     required this.userRepository,
     required this.tokenRepository,
     required this.refreshTokenRepository,
+    required this.unauthorizedApiService,
   }) : super(LoginState.initial()) {
     on<LoginLoginButtonClicked>(_loginButtonClicked);
     on<LoginEmailChanged>(_emailChanged);
@@ -74,7 +75,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     required final String email,
     required final String password,
   }) async {
-    final response = await UnauthorizedApiService.getInstance().login(
+    final response = await unauthorizedApiService.login(
       email: email,
       password: password,
     );
