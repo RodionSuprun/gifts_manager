@@ -57,12 +57,9 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
         BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state.authenticated) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return const HomePage();
-                  },
-                ),
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false,
               );
             }
           },
@@ -152,7 +149,7 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
           ),
           const SizedBox(height: 8),
           TextButton(
-            onPressed: () async{
+            onPressed: () async {
               final resetPasswordResult = await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) {
@@ -161,9 +158,7 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
                 ),
               );
               if (resetPasswordResult == true) {
-                context
-                    .read<LoginBloc>()
-                    .add(const LoginAfterResetPassword());
+                context.read<LoginBloc>().add(const LoginAfterResetPassword());
               }
             },
             child: const Text("Не помню пароль"),
