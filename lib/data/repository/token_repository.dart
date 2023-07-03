@@ -1,3 +1,4 @@
+import '../../di/service_locator.dart';
 import '../storage/shared_preference_data.dart';
 import 'base/reactive_repository.dart';
 
@@ -5,7 +6,7 @@ class TokenRepository extends ReactiveRepository<String> {
   static TokenRepository? _instance;
 
   factory TokenRepository.getInstance() => _instance ??=
-      TokenRepository._internal(SharedPreferenceData.getInstance());
+      TokenRepository._internal(sl.get<SharedPreferenceData>());
 
   TokenRepository._internal(this._spData);
 

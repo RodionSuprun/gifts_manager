@@ -3,7 +3,11 @@ import 'package:gifts_manager/presentation/login/view/login_page.dart';
 import 'package:gifts_manager/presentation/splash/view/splash_page.dart';
 import 'package:gifts_manager/presentation/theme/theme.dart';
 
+import 'di/service_locator.dart';
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  initServiceLocator();
   runApp(const MyApp());
 }
 
