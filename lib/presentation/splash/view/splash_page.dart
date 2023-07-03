@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gifts_manager/presentation/login/view/login_page.dart';
 import 'package:gifts_manager/presentation/splash/bloc/splash_bloc.dart';
 
+import '../../../di/service_locator.dart';
 import '../../home/view/home_page.dart';
 
 class SplashPage extends StatefulWidget {
@@ -18,7 +19,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _bloc = SplashBloc();
+    _bloc = sl.get<SplashBloc>();
     _bloc.add(const SplashLoaded());
   }
 
@@ -26,7 +27,7 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _bloc,
-      child: _SplashPageWidget(),
+      child: const _SplashPageWidget(),
     );
   }
 }

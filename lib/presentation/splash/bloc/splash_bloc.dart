@@ -12,7 +12,9 @@ part 'splash_event.dart';
 part 'splash_state.dart';
 
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
-  SplashBloc() : super(SplashInitial()) {
+  final TokenRepository tokenRepository;
+
+  SplashBloc({required this.tokenRepository}) : super(SplashInitial()) {
     on<SplashLoaded>(_onSplashLoaded);
   }
 
@@ -20,7 +22,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     final SplashLoaded event,
     final Emitter<SplashState> emit,
   ) async {
-    final token = await sl.get<TokenRepository>().getItem();
+    final token = await tokenRepository.getItem();
     if (token == null || token.isEmpty) {
       emit(const SplashUnauthorized());
     } else {

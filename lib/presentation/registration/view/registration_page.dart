@@ -8,6 +8,7 @@ import 'package:gifts_manager/extensions/theme_extension.dart';
 import 'package:gifts_manager/presentation/registration/bloc/registration_bloc.dart';
 import 'package:gifts_manager/resources/app_colors.dart';
 
+import '../../../di/service_locator.dart';
 import '../../home/view/home_page.dart';
 
 class RegistrationPage extends StatelessWidget {
@@ -16,7 +17,7 @@ class RegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => RegistrationBloc(),
+      create: (context) => sl.get<RegistrationBloc>(),
       child: const Scaffold(
         body: _RegistrationPageWidget(),
       ),

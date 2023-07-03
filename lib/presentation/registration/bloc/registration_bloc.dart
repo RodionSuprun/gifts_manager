@@ -16,7 +16,6 @@ import 'package:gifts_manager/presentation/registration/model/errors.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/http/unauthorized_api_service.dart';
-import '../../../di/service_locator.dart';
 
 part 'registration_event.dart';
 
@@ -48,8 +47,15 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   bool _highlightNameError = false;
   RegistrationNameError? _nameError = RegistrationNameError.empty;
 
-  RegistrationBloc()
-      : super(RegistrationFieldsInfo(
+  final UserRepository userRepository;
+  final TokenRepository tokenRepository;
+  final RefreshTokenRepository refreshTokenRepository;
+
+  RegistrationBloc({
+    required this.userRepository,
+    required this.tokenRepository,
+    required this.refreshTokenRepository,
+  }) : super(RegistrationFieldsInfo(
             avatarLink: _avatarBuilder(defaultAvatarKey))) {
     on<RegistrationChangeAvatar>(_onChangeAvatar);
     on<RegistrationEmailChanged>(_onChangeEmail);
@@ -85,11 +91,9 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     final response = await register();
     if (response.isRight) {
       final userWithToken = response.right;
-      await sl.get<UserRepository>().setItem(userWithToken.user);
-      await sl.get<TokenRepository>().setItem(userWithToken.token);
-      await sl
-          .get<RefreshTokenRepository>()
-          .setItem(userWithToken.refreshToken);
+      await userRepository.setItem(userWithToken.user);
+      await tokenRepository.setItem(userWithToken.token);
+      await refreshTokenRepository.setItem(userWithToken.refreshToken);
       emit(const RegistrationCompleted());
     } else {
       emit(const RegistrationErrorState(RequestError.unknown));

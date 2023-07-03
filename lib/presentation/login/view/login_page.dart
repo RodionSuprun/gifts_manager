@@ -9,13 +9,15 @@ import 'package:gifts_manager/presentation/registration/view/registration_page.d
 import 'package:gifts_manager/presentation/reset_password/view/reset_password_page.dart';
 import 'package:gifts_manager/resources/app_colors.dart';
 
+import '../../../di/service_locator.dart';
+
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => LoginBloc(),
+      create: (context) => sl.get<LoginBloc>(),
       child: const Scaffold(
         body: _LoginPageWidget(),
       ),
