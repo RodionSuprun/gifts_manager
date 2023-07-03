@@ -6,6 +6,7 @@ import 'package:gifts_manager/data/http/model/gift_dto.dart';
 import 'package:gifts_manager/data/http/model/gifts_response_dto.dart';
 import 'package:gifts_manager/data/http/model/user_dto.dart';
 import 'package:gifts_manager/data/http/unauthorized_api_service.dart';
+import 'package:gifts_manager/data/repository/refresh_token_repository.dart';
 import 'package:gifts_manager/data/repository/token_repository.dart';
 
 import '../../../data/http/authorized_api_service.dart';
@@ -21,6 +22,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final TokenRepository tokenRepository;
   final LogoutInteractor logoutInteractor;
   final AuthorizedApiService authorizedApiService;
+  final UnauthorizedApiService unauthorizedApiService;
+  final RefreshTokenRepository refreshTokenRepository;
 
   late final StreamSubscription _logoutSubscription;
 
@@ -29,6 +32,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.tokenRepository,
     required this.logoutInteractor,
     required this.authorizedApiService,
+    required this.unauthorizedApiService,
+    required this.refreshTokenRepository,
   }) : super(HomeInitial()) {
     on<HomePageLoaded>(_onHomePageLoaded);
     on<HomeLogoutPushed>(_onHomeLogoutPushed);
@@ -48,13 +53,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     final user = await userRepository.getItem();
     final token = await tokenRepository.getItem();
-    if (user == null || token == null) {
+    final refreshToken = await refreshTokenRepository.getItem();
+    if (user == null || token == null || refreshToken == null) {
       _logout();
       return;
     }
 
-    final giftsResponse =
-        await authorizedApiService.getAllGifts();
+    final newTokensResponse = await unauthorizedApiService.refreshToken(refreshToken: refreshToken);
+    if (newTokensResponse.isLeft) {
+      _logout();
+      return;
+    }
+    await refreshTokenRepository.setItem(newTokensResponse.right.refreshToken);
+    await tokenRepository.setItem(newTokensResponse.right.token);
+
+    final giftsResponse = await authorizedApiService.getAllGifts();
 
     final gifts =
         giftsResponse.isRight ? giftsResponse.right.gifts : const <GiftDTO>[];
