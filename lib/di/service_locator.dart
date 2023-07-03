@@ -6,6 +6,7 @@ import 'package:gifts_manager/data/repository/token_repository.dart';
 import 'package:gifts_manager/data/repository/user_provider.dart';
 import 'package:gifts_manager/data/repository/user_repository.dart';
 import 'package:gifts_manager/data/storage/shared_preference_data.dart';
+import 'package:gifts_manager/domain/logout_interactor.dart';
 import 'package:gifts_manager/presentation/home/bloc/home_bloc.dart';
 import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
 import 'package:gifts_manager/presentation/splash/bloc/splash_bloc.dart';
@@ -53,7 +54,15 @@ void _setupRepositories() {
 }
 
 //Only singletons
-void _setupInteractors() {}
+void _setupInteractors() {
+  sl.registerLazySingleton(
+    () => LogoutInteractor(
+      userRepository: sl.get<UserRepository>(),
+      tokenRepository: sl.get<TokenRepository>(),
+      refreshTokenRepository: sl.get<RefreshTokenRepository>(),
+    ),
+  );
+}
 
 //Only singletons
 void _setupComplexInteractors() {}
@@ -89,6 +98,7 @@ void _setupBlocs() {
     () => HomeBloc(
       userRepository: sl.get<UserRepository>(),
       tokenRepository: sl.get<TokenRepository>(),
+      logoutInteractor: sl.get<LogoutInteractor>(),
     ),
   );
 }
