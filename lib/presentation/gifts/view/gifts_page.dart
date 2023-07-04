@@ -127,11 +127,14 @@ class _InitialLoadingErrorWidget extends StatelessWidget {
         const SizedBox(
           height: 24,
         ),
-        ElevatedButton(
-          onPressed: () {
-            context.read<GiftsBloc>().add(const GiftsLoadingRequest());
-          },
-          child: Text("Повторить попытку"),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: ElevatedButton(
+            onPressed: () {
+              context.read<GiftsBloc>().add(const GiftsLoadingRequest());
+            },
+            child: Text("Повторить попытку"),
+          ),
         ),
         const Spacer(),
       ],
