@@ -7,7 +7,7 @@ part 'gifts_event.dart';
 part 'gifts_state.dart';
 
 class GiftsBloc extends Bloc<GiftsEvent, GiftsState> {
-  GiftsBloc() : super(InitialGiftsLoadingState()) {
+  GiftsBloc() : super(InitialLoadingStateError()) {
     on<GiftsEvent>((event, emit) {
       // TODO: implement event handler
     });

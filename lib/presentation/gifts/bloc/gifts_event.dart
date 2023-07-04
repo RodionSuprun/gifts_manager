@@ -11,3 +11,10 @@ class GiftsPageLoaded extends GiftsEvent {
   List<Object?> get props => [];
 }
 
+
+class GiftsLoadingRequest extends GiftsEvent {
+  const GiftsLoadingRequest();
+
+  @override
+  List<Object?> get props => [];
+}
