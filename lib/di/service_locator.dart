@@ -10,8 +10,10 @@ import 'package:gifts_manager/data/repository/user_provider.dart';
 import 'package:gifts_manager/data/repository/user_repository.dart';
 import 'package:gifts_manager/data/storage/shared_preference_data.dart';
 import 'package:gifts_manager/domain/logout_interactor.dart';
+import 'package:gifts_manager/presentation/gifts/bloc/gifts_bloc.dart';
 import 'package:gifts_manager/presentation/home/bloc/home_bloc.dart';
 import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
+import 'package:gifts_manager/presentation/new_present/view/create_new_present.dart';
 import 'package:gifts_manager/presentation/splash/bloc/splash_bloc.dart';
 
 import '../data/repository/refresh_token_provider.dart';
@@ -133,5 +135,13 @@ void _setupBlocs() {
     () => ResetPasswordBloc(
       unauthorizedApiService: sl.get<UnauthorizedApiService>(),
     ),
+  );
+
+  sl.registerFactory(
+    () => const CreatePresentPage(),
+  );
+
+  sl.registerFactory(
+    () => GiftsBloc(),
   );
 }

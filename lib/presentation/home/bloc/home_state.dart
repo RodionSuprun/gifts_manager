@@ -30,3 +30,10 @@ class HomeLogoutState extends HomeState {
   @override
   List<Object?> get props => [];
 }
+
+class HomeCreateNewPresentState extends HomeState {
+  const HomeCreateNewPresentState();
+
+  @override
+  List<Object?> get props => [];
+}

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gifts_manager/extensions/theme_extension.dart';
-import 'package:gifts_manager/presentation/login/view/login_page.dart';
 
 import '../../../data/model/request_error.dart';
 import '../../../di/service_locator.dart';
@@ -63,7 +62,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         "Произошла ошибка".toUpperCase(),
                       ),
                       margin: const EdgeInsets.only(
-                          left: 16, right: 16, bottom: 96),
+                        left: 16,
+                        right: 16,
+                        bottom: 96,
+                      ),
                     ),
                   );
                 }

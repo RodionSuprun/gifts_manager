@@ -11,7 +11,6 @@ import 'package:gifts_manager/data/http/model/user_with_tokens_dto.dart';
 
 import 'base_api_service.dart';
 import 'model/create_account_request_dto.dart';
-import 'model/gifts_response_dto.dart';
 import 'model/refresh_token_request.dart';
 import 'model/reset_password_request_dto.dart';
 

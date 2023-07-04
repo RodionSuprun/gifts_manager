@@ -2,14 +2,13 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:gifts_manager/data/http/model/gift_dto.dart';
-import 'package:gifts_manager/data/http/model/gifts_response_dto.dart';
 import 'package:gifts_manager/data/http/model/user_dto.dart';
 import 'package:gifts_manager/data/http/unauthorized_api_service.dart';
 import 'package:gifts_manager/data/repository/refresh_token_repository.dart';
 import 'package:gifts_manager/data/repository/token_repository.dart';
 
 import '../../../data/http/authorized_api_service.dart';
+import '../../../data/http/model/gift_dto.dart';
 import '../../../data/repository/user_repository.dart';
 import '../../../domain/logout_interactor.dart';
 
@@ -34,9 +33,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.authorizedApiService,
     required this.unauthorizedApiService,
     required this.refreshTokenRepository,
-  }) : super(HomeInitial()) {
+  }) : super(const HomeInitial()) {
     on<HomePageLoaded>(_onHomePageLoaded);
     on<HomeLogoutPushed>(_onHomeLogoutPushed);
+    on<HomeCreatePresentPushed>(_onHomeCreateNewPresentPushed);
     on<HomeExternalLogout>(_onHomeExternalLogout);
     _logoutSubscription = userRepository
         .observeItem()
@@ -93,6 +93,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     emit(const HomeLogoutState());
   }
+
+  FutureOr<void> _onHomeCreateNewPresentPushed(
+      final HomeCreatePresentPushed event,
+      final Emitter<HomeState> emit,
+      ) async {
+    emit(const HomeCreateNewPresentState());
+  }
+
 
   @override
   Future<void> close() {

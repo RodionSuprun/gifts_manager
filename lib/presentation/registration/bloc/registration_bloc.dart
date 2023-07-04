@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:bloc/bloc.dart';
 import 'package:either_dart/either.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gifts_manager/data/http/model/api_error.dart';
 import 'package:gifts_manager/data/http/model/user_with_tokens_dto.dart';
 import 'package:gifts_manager/data/model/request_error.dart';
@@ -13,7 +13,6 @@ import 'package:gifts_manager/data/repository/refresh_token_repository.dart';
 import 'package:gifts_manager/data/repository/token_repository.dart';
 import 'package:gifts_manager/data/repository/user_repository.dart';
 import 'package:gifts_manager/presentation/registration/model/errors.dart';
-import 'package:meta/meta.dart';
 
 import '../../../data/http/unauthorized_api_service.dart';
 
