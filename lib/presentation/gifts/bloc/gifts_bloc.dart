@@ -15,6 +15,8 @@ class GiftsBloc extends Bloc<GiftsEvent, GiftsState> {
   }) : super(InitialGiftsLoadingState()) {
     on<GiftsPageLoaded>(_onGiftsPageLoaded);
     on<GiftsLoadingRequest>(_onGiftsLoadingRequest);
+    on<GiftsAutoLoadingRequest>(_onGiftsAutoLoadingRequest);
+
   }
 
   static const _limit = 10;
@@ -22,8 +24,18 @@ class GiftsBloc extends Bloc<GiftsEvent, GiftsState> {
   PaginationInfo paginationInfo = PaginationInfo.initial();
 
   final gifts = <GiftDTO>[];
-  bool initialErrorHappened = false;
+  bool errorHappened = false;
   bool loading = false;
+
+  FutureOr<void> _onGiftsAutoLoadingRequest(
+      final GiftsAutoLoadingRequest event,
+      final Emitter<GiftsState> emit,
+      ) async {
+    if (errorHappened) {
+      return;
+    }
+    await _loadGifts(emit);
+  }
 
   FutureOr<void> _onGiftsPageLoaded(
     final GiftsPageLoaded event,
@@ -57,7 +69,7 @@ class GiftsBloc extends Bloc<GiftsEvent, GiftsState> {
       offset: paginationInfo.lastLoadedPage * _limit,
     );
     if (giftsResponse.isLeft) {
-      initialErrorHappened = true;
+      errorHappened = true;
       if (gifts.isEmpty) {
         emit(const InitialLoadingStateError());
       } else {
@@ -68,7 +80,7 @@ class GiftsBloc extends Bloc<GiftsEvent, GiftsState> {
         ));
       }
     } else {
-      initialErrorHappened = false;
+      errorHappened = false;
       final canLoadMore = giftsResponse.right.gifts.length == _limit;
       paginationInfo = PaginationInfo(
         canLoadMore: canLoadMore,
@@ -79,7 +91,7 @@ class GiftsBloc extends Bloc<GiftsEvent, GiftsState> {
       } else {
         gifts.addAll(giftsResponse.right.gifts);
         emit(LoadedGiftsState(
-          gifts: gifts,
+          gifts: [...gifts],
           showLoading: canLoadMore,
           showError: false,
         ));

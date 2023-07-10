@@ -148,7 +148,7 @@ class _InitialLoadingErrorWidget extends StatelessWidget {
   }
 }
 
-class _GiftsListWidget extends StatelessWidget {
+class _GiftsListWidget extends StatefulWidget {
   final List<GiftDTO> gifts;
   final bool showLoading;
   final bool showError;
@@ -161,8 +161,35 @@ class _GiftsListWidget extends StatelessWidget {
       : super(key: key);
 
   @override
+  State<_GiftsListWidget> createState() => _GiftsListWidgetState();
+}
+
+class _GiftsListWidgetState extends State<_GiftsListWidget> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.addListener(() {
+        if (_scrollController.position.extentAfter < 300) {
+          context.read<GiftsBloc>().add(const GiftsAutoLoadingRequest());
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      controller: _scrollController,
       padding: const EdgeInsets.symmetric(
         horizontal: 24,
         vertical: 32,
@@ -172,7 +199,7 @@ class _GiftsListWidget extends StatelessWidget {
           height: 12,
         );
       },
-      itemCount: gifts.length + 1 + ((_haveExtraWidget) ? 1 : 0),
+      itemCount: widget.gifts.length + 1 + ((_haveExtraWidget) ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == 0) {
           return const Text(
@@ -183,26 +210,44 @@ class _GiftsListWidget extends StatelessWidget {
             ),
           );
         }
-        if (index == gifts.length + 1) {
-          if (showLoading) {
+        if (index == widget.gifts.length + 1) {
+          if (widget.showLoading) {
             return Container(
               height: 56,
               alignment: Alignment.center,
               child: const CircularProgressIndicator(),
             );
           } else {
-            if (!showError) {
+            if (!widget.showError) {
               print("Error !showerror");
             }
             return Container(
-              height: 56,
+              height: 128,
               alignment: Alignment.center,
-              child: const Text("Ошибка"),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFFFFE8F2),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Не удалось загрузить данные'),
+                  const Text('Попробуйте еще раз'),
+                  TextButton(
+                    onPressed: () => context
+                        .read<GiftsBloc>()
+                        .add(const GiftsLoadingRequest()),
+                    child: const Text('Попробовать еще раз'),
+                  )
+                ],
+              ),
             );
           }
         }
 
-        final gift = gifts[index - 1];
+        final gift = widget.gifts[index - 1];
 
         return Container(
           padding: const EdgeInsets.symmetric(
@@ -245,5 +290,5 @@ class _GiftsListWidget extends StatelessWidget {
     );
   }
 
-  bool get _haveExtraWidget => showError || showLoading;
+  bool get _haveExtraWidget => widget.showError || widget.showLoading;
 }
