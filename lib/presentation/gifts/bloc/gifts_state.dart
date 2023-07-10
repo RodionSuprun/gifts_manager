@@ -24,8 +24,20 @@ class InitialLoadingStateError extends GiftsState {
 }
 
 class LoadedGiftsState extends GiftsState {
-  const LoadedGiftsState();
+  final List<GiftDTO> gifts;
+  final bool showLoading;
+  final bool showError;
+
+  const LoadedGiftsState({
+    required this.gifts,
+    required this.showLoading,
+    required this.showError,
+  }) : assert(!(showLoading && showError));
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [
+        gifts,
+        showLoading,
+        showError,
+      ];
 }

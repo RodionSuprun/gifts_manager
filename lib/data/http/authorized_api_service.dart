@@ -37,6 +37,8 @@ class AuthorizedApiService extends BaseApiService {
         // ),
       );
 
+      print(response.data);
+
       return GiftsResponseDto.fromJson(response.data);
     });
   }
