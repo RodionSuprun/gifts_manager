@@ -5,6 +5,7 @@ import 'package:gifts_manager/presentation/login/view/login_page.dart';
 import 'package:gifts_manager/presentation/new_present/view/create_new_present.dart';
 
 import '../../../di/service_locator.dart';
+import '../../homeTrain/presentation/home_train.dart';
 import '../bloc/home_bloc.dart';
 
 class HomePage extends StatelessWidget {
@@ -89,6 +90,16 @@ class HomePageWidget extends StatelessWidget {
                 },
                 child: const Text("Go gifts"),
               ),
+
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => HomeTrain(),
+                  ));
+                },
+                child: const Text("Go HomeTrain"),
+              ),
+
             ],
           ),
         ),

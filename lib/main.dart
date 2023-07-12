@@ -4,6 +4,7 @@ import 'package:gifts_manager/presentation/splash/view/splash_page.dart';
 import 'package:gifts_manager/presentation/theme/theme.dart';
 
 import 'di/service_locator.dart';
+import 'navigation/route_generator.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.light,
-      home: const SplashPage(),
+      onGenerateRoute: generateRoute(),
     );
   }
 }

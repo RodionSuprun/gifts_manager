@@ -1,26 +1,27 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:gifts_manager/data/http/authorization_interceptor.dart';
-import 'package:gifts_manager/data/http/authorized_api_service.dart';
-import 'package:gifts_manager/data/http/dio_provider.dart';
-import 'package:gifts_manager/data/http/unauthorized_api_service.dart';
-import 'package:gifts_manager/data/repository/refresh_token_repository.dart';
-import 'package:gifts_manager/data/repository/token_provider.dart';
-import 'package:gifts_manager/data/repository/token_repository.dart';
-import 'package:gifts_manager/data/repository/user_provider.dart';
-import 'package:gifts_manager/data/repository/user_repository.dart';
-import 'package:gifts_manager/data/storage/shared_preference_data.dart';
-import 'package:gifts_manager/domain/logout_interactor.dart';
-import 'package:gifts_manager/presentation/gifts/bloc/gifts_bloc.dart';
-import 'package:gifts_manager/presentation/home/bloc/home_bloc.dart';
-import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
-import 'package:gifts_manager/presentation/new_present/view/create_new_present.dart';
-import 'package:gifts_manager/presentation/splash/bloc/splash_bloc.dart';
 
+import '../data/http/authorization_interceptor.dart';
+import '../data/http/authorized_api_service.dart';
+import '../data/http/dio_provider.dart';
+import '../data/http/unauthorized_api_service.dart';
 import '../data/repository/refresh_token_provider.dart';
+import '../data/repository/refresh_token_repository.dart';
+import '../data/repository/token_repository.dart';
+import '../data/repository/user_repository.dart';
+import '../data/storage/shared_preference_data.dart';
+import '../domain/logout_interactor.dart';
+import '../presentation/gifts/bloc/gifts_bloc.dart';
+import '../presentation/home/bloc/home_bloc.dart';
+import '../presentation/login/bloc/login_bloc.dart';
 import '../presentation/registration/bloc/registration_bloc.dart';
 import '../presentation/reset_password/bloc/reset_password_bloc.dart';
+import '../presentation/splash/bloc/splash_bloc.dart';
 
 final sl = GetIt.instance;
+
+const _notAuthorizedDio = 'notAuthorizedDio';
+const _authorizedDio = 'authorizedDio';
 
 void initServiceLocator() {
   _setupDataProviders();
@@ -31,34 +32,28 @@ void initServiceLocator() {
   _setupBlocs();
 }
 
-//Only singletons
+/// ONLY SINGLETONS
 void _setupDataProviders() {
   sl.registerLazySingleton(() => SharedPreferenceData());
   sl.registerLazySingleton<RefreshTokenProvider>(
     () => sl.get<SharedPreferenceData>(),
   );
-  sl.registerLazySingleton<TokenProvider>(
-    () => sl.get<SharedPreferenceData>(),
-  );
-  sl.registerLazySingleton<UserProvider>(
-    () => sl.get<SharedPreferenceData>(),
-  );
 }
 
-//Only singletons
+/// ONLY SINGLETONS
 void _setupRepositories() {
   sl.registerLazySingleton(
     () => RefreshTokenRepository(sl.get<RefreshTokenProvider>()),
   );
   sl.registerLazySingleton(
-    () => TokenRepository(sl.get<TokenProvider>()),
+    () => UserRepository(sl.get<SharedPreferenceData>()),
   );
   sl.registerLazySingleton(
-    () => UserRepository(sl.get<UserProvider>()),
+    () => TokenRepository(sl.get<SharedPreferenceData>()),
   );
 }
 
-//Only singletons
+/// ONLY SINGLETONS
 void _setupInteractors() {
   sl.registerLazySingleton(
     () => LogoutInteractor(
@@ -69,32 +64,41 @@ void _setupInteractors() {
   );
 }
 
-//Only singletons
+/// ONLY SINGLETONS
 void _setupComplexInteractors() {}
 
 void _setupApiRelatedClasses() {
   sl.registerFactory(() => DioBuilder());
-
   sl.registerLazySingleton(
     () => AuthorizationInterceptor(
       tokenRepository: sl.get<TokenRepository>(),
       logoutInteractor: sl.get<LogoutInteractor>(),
     ),
   );
-
-  sl.registerLazySingleton(
-    () => UnauthorizedApiService(sl.get<DioBuilder>().build()),
+  sl.registerSingleton<Dio>(
+    sl.get<DioBuilder>().build(),
+    instanceName: _notAuthorizedDio,
   );
-
-  sl.registerLazySingleton(
-    () => AuthorizedApiService(sl
+  sl.registerSingleton<Dio>(
+    sl
         .get<DioBuilder>()
         .addAuthorizationInterceptor(sl.get<AuthorizationInterceptor>())
-        .build()),
+        .build(),
+    instanceName: _authorizedDio,
+  );
+  sl.registerLazySingleton(
+    () => UnauthorizedApiService(sl.get<Dio>(instanceName: _notAuthorizedDio)),
+  );
+  sl.registerLazySingleton(
+    () => AuthorizedApiService(
+      sl.get<Dio>(instanceName: _authorizedDio),
+      sl.get<UnauthorizedApiService>(),
+      sl.get<RefreshTokenRepository>(),
+    ),
   );
 }
 
-//Only factories
+/// ONLY FACTORIES
 void _setupBlocs() {
   sl.registerFactory(
     () => LoginBloc(
@@ -104,7 +108,6 @@ void _setupBlocs() {
       unauthorizedApiService: sl.get<UnauthorizedApiService>(),
     ),
   );
-
   sl.registerFactory(
     () => RegistrationBloc(
       userRepository: sl.get<UserRepository>(),
@@ -113,37 +116,32 @@ void _setupBlocs() {
       unauthorizedApiService: sl.get<UnauthorizedApiService>(),
     ),
   );
-
   sl.registerFactory(
     () => SplashBloc(
       tokenRepository: sl.get<TokenRepository>(),
     ),
   );
-
   sl.registerFactory(
     () => HomeBloc(
       userRepository: sl.get<UserRepository>(),
-      tokenRepository: sl.get<TokenRepository>(),
       logoutInteractor: sl.get<LogoutInteractor>(),
       authorizedApiService: sl.get<AuthorizedApiService>(),
       unauthorizedApiService: sl.get<UnauthorizedApiService>(),
       refreshTokenRepository: sl.get<RefreshTokenRepository>(),
+      tokenRepository: sl.get<TokenRepository>(),
     ),
   );
-
-  sl.registerFactory(
-    () => ResetPasswordBloc(
-      unauthorizedApiService: sl.get<UnauthorizedApiService>(),
-    ),
-  );
-
-  sl.registerFactory(
-    () => const CreatePresentPage(),
-  );
-
   sl.registerFactory(
     () => GiftsBloc(
       authorizedApiService: sl.get<AuthorizedApiService>(),
     ),
   );
+
+  sl.registerFactory(
+        () => ResetPasswordBloc(
+          unauthorizedApiService: sl.get<UnauthorizedApiService>(),
+    ),
+  );
+
+
 }

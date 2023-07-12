@@ -111,7 +111,7 @@ class PaginationInfo extends Equatable {
   });
 
   factory PaginationInfo.initial() =>
-      PaginationInfo(canLoadMore: true, lastLoadedPage: 0);
+      const PaginationInfo(canLoadMore: true, lastLoadedPage: 0);
 
   @override
   List<Object?> get props => [canLoadMore, lastLoadedPage];
