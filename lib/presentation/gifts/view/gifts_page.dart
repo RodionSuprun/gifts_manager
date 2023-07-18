@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gifts_manager/data/http/model/user_dto.dart';
 import 'package:gifts_manager/data/repository/token_repository.dart';
 import 'package:gifts_manager/extensions/theme_extension.dart';
+import 'package:gifts_manager/presentation/gift/gift_page.dart';
 import 'package:gifts_manager/presentation/login/view/login_page.dart';
 import 'package:gifts_manager/presentation/new_present/view/create_new_present.dart';
 import 'package:gifts_manager/resources/app_colors.dart';
@@ -11,6 +12,7 @@ import 'package:gifts_manager/resources/app_colors.dart';
 import '../../../data/http/model/gift_dto.dart';
 import '../../../data/repository/user_repository.dart';
 import '../../../di/service_locator.dart';
+import '../../../navigation/route_name.dart';
 import '../../../resources/illustrations.dart';
 import '../bloc/gifts_bloc.dart';
 
@@ -32,26 +34,23 @@ class GiftsPageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: SafeArea(
-        child: BlocBuilder<GiftsBloc, GiftsState>(
-          builder: (context, state) {
-            if (state is InitialGiftsLoadingState) {
-              return _LoadingWidget();
-            } else if (state is NoGiftsState) {
-              return _NoGiftsWidget();
-            } else if (state is InitialLoadingStateError) {
-              return _InitialLoadingErrorWidget();
-            } else if (state is LoadedGiftsState) {
-              return _GiftsListWidget(
-                gifts: state.gifts,
-                showLoading: state.showLoading,
-                showError: state.showError,
-              );
-            }
-            return const Text("GiftsPage");
-          },
-        ),
+      body: BlocBuilder<GiftsBloc, GiftsState>(
+        builder: (context, state) {
+          if (state is InitialGiftsLoadingState) {
+            return _LoadingWidget();
+          } else if (state is NoGiftsState) {
+            return _NoGiftsWidget();
+          } else if (state is InitialLoadingStateError) {
+            return _InitialLoadingErrorWidget();
+          } else if (state is LoadedGiftsState) {
+            return _GiftsListWidget(
+              gifts: state.gifts,
+              showLoading: state.showLoading,
+              showError: state.showError,
+            );
+          }
+          return const Text("GiftsPage");
+        },
       ),
     );
   }
@@ -188,11 +187,14 @@ class _GiftsListWidgetState extends State<_GiftsListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
     return ListView.separated(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 32,
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        bottom: 32,
+        top: 32 + mediaQuery.padding.top,
       ),
       separatorBuilder: (_, index) {
         return const SizedBox(
@@ -249,40 +251,48 @@ class _GiftsListWidgetState extends State<_GiftsListWidget> {
 
         final gift = widget.gifts[index - 1];
 
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: AppColors.lightLightBlue100,
-          ),
-          child: Center(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        gift.name,
-                        style: context.theme.textTheme.headline2,
-                      ),
-                      Text(
-                        gift.price.toString(),
-                        style: context.theme.textTheme.headline3,
-                      ),
-                    ],
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              RouteName.gift.route,
+              arguments: GiftPageArgs(gift.name),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.lightLightBlue100,
+            ),
+            child: Center(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          gift.name,
+                          style: context.theme.textTheme.headline2,
+                        ),
+                        Text(
+                          gift.price.toString(),
+                          style: context.theme.textTheme.headline3,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SvgPicture.asset(
-                  Illustrations.noGifts,
-                  height: 48,
-                  width: 48,
-                ),
-              ],
+                  SvgPicture.asset(
+                    Illustrations.noGifts,
+                    height: 48,
+                    width: 48,
+                  ),
+                ],
+              ),
             ),
           ),
         );

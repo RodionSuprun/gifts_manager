@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gifts_manager/navigation/route_name.dart';
 import 'package:gifts_manager/presentation/splash/view/splash_page.dart';
 
+import '../presentation/gift/gift_page.dart';
 import '../presentation/gifts/view/gifts_page.dart';
 import '../presentation/home/view/home_page.dart';
 import '../presentation/login/view/login_page.dart';
@@ -32,17 +33,17 @@ RouteFactory generateRoute() {
       case RouteName.splash:
         return _createPageRoute(const SplashPage(), routeName);
 
-      // case RouteName.gift:
-      //   final args = settings.arguments is GiftPageArgs
-      //       ? settings.arguments as GiftPageArgs
-      //       : null;
-      //   if (args == null) {
-      //     debugPrint('ADD ARGUMENTS!!!');
-      //   }
-      //   return _createPageRoute(
-      //     GiftPage(args: args ?? const GiftPageArgs('unknown')),
-      //     routeName,
-      //   );
+      case RouteName.gift:
+        final args = settings.arguments is GiftPageArgs
+            ? settings.arguments as GiftPageArgs
+            : null;
+        if (args == null) {
+          debugPrint('ADD ARGUMENTS!!!');
+        }
+        return _createPageRoute(
+          GiftPage(args: args ?? const GiftPageArgs('unknown')),
+          routeName,
+        );
     }
   };
 }

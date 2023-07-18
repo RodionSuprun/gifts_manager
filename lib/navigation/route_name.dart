@@ -6,6 +6,7 @@ enum RouteName {
   registration(route: "/registration"),
   resetPassword(route: "/resetPassword"),
   gifts(route: "/gifts"),
+  gift(route: "/gift"),
   splash(route: "/"),
   ;
 
