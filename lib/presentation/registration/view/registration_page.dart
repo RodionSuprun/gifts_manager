@@ -9,6 +9,7 @@ import 'package:gifts_manager/presentation/registration/bloc/registration_bloc.d
 import 'package:gifts_manager/resources/app_colors.dart';
 
 import '../../../di/service_locator.dart';
+import '../../../navigation/route_name.dart';
 import '../../home/view/home_page.dart';
 
 class RegistrationPage extends StatelessWidget {
@@ -96,10 +97,7 @@ class _RegistrationPageWidgetState extends State<_RegistrationPageWidget> {
         BlocListener<RegistrationBloc, RegistrationState>(
           listener: (context, state) {
             if (state is RegistrationCompleted) {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const HomePage()),
-                (route) => false,
-              );
+              Navigator.of(context).pushReplacementNamed(RouteName.home.route);
             }
           },
         ),

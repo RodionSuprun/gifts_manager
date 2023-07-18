@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gifts_manager/data/model/request_error.dart';
 import 'package:gifts_manager/extensions/theme_extension.dart';
+import 'package:gifts_manager/navigation/route_name.dart';
 import 'package:gifts_manager/presentation/home/view/home_page.dart';
 import 'package:gifts_manager/presentation/login/bloc/login_bloc.dart';
 import 'package:gifts_manager/presentation/login/model/models.dart';
@@ -57,10 +58,7 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
         BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state.authenticated) {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const HomePage()),
-                (route) => false,
-              );
+              Navigator.of(context).pushReplacementNamed(RouteName.home.route);
             }
           },
         ),
@@ -135,13 +133,7 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const RegistrationPage();
-                      },
-                    ),
-                  );
+                  Navigator.of(context).pushNamed(RouteName.registration.route);
                 },
                 child: const Text("Создать"),
               ),

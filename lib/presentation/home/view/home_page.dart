@@ -5,6 +5,7 @@ import 'package:gifts_manager/presentation/login/view/login_page.dart';
 import 'package:gifts_manager/presentation/new_present/view/create_new_present.dart';
 
 import '../../../di/service_locator.dart';
+import '../../../navigation/route_name.dart';
 import '../../homeTrain/presentation/home_train.dart';
 import '../bloc/home_bloc.dart';
 
@@ -30,10 +31,7 @@ class HomePageWidget extends StatelessWidget {
         BlocListener<HomeBloc, HomeState>(
           listener: (context, state) {
             if (state is HomeLogoutState) {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (route) => false,
-              );
+              Navigator.of(context).pushReplacementNamed(RouteName.login.route);
             }
           },
         ),
@@ -84,9 +82,7 @@ class HomePageWidget extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () async {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => GiftsPage(),
-                  ));
+                  Navigator.of(context).pushNamed(RouteName.gifts.route);
                 },
                 child: const Text("Go gifts"),
               ),

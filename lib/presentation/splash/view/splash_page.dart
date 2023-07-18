@@ -4,6 +4,7 @@ import 'package:gifts_manager/presentation/login/view/login_page.dart';
 import 'package:gifts_manager/presentation/splash/bloc/splash_bloc.dart';
 
 import '../../../di/service_locator.dart';
+import '../../../navigation/route_name.dart';
 import '../../home/view/home_page.dart';
 
 class SplashPage extends StatefulWidget {
@@ -42,15 +43,9 @@ class _SplashPageWidget extends StatelessWidget {
     return BlocListener<SplashBloc, SplashState>(
       listener: (context, state) {
         if (state is SplashAuthorized) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const HomePage()),
-            (route) => false,
-          );
+          Navigator.of(context).pushReplacementNamed(RouteName.home.route);
         } else if (state is SplashUnauthorized) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const LoginPage()),
-            (route) => false,
-          );
+          Navigator.of(context).pushReplacementNamed(RouteName.login.route);
         }
       },
       child: const Scaffold(
